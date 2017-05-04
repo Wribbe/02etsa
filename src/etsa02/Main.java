@@ -69,6 +69,16 @@ public class Main extends Application {
 			}
 		});
 
+		/* Set up listener that fire the sign in button if ENTER is pressed in
+		 * any text field. */
+		userTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent key){
+				if (key.getCode() == KeyCode.ENTER) {
+					signIn.fire();
+				}
+			}
+		});
+
 		passwordBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent key){
 				if (key.getCode() == KeyCode.ENTER) {
