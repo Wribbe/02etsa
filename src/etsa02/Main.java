@@ -10,6 +10,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -52,6 +54,7 @@ public class Main extends Application {
 		
 		PasswordField passwordBox = new PasswordField();
 		grid.add(passwordBox, 1, 2);
+		
 
 		Button signIn = new Button("Sign in");
 		HBox hbButton = new HBox(10);
@@ -66,6 +69,14 @@ public class Main extends Application {
 		signIn.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				actiontarget.setText("Sign in button pressed.");
+			}
+		});
+
+		passwordBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent key){
+				if (key.getCode() == KeyCode.ENTER) {
+					signIn.fire();
+				}
 			}
 		});
 		
