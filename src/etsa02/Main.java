@@ -31,24 +31,24 @@ public class Main extends Application {
     int MAIN_HEIGHT = 200;
     int MAIN_WIDTH = 200;
 
-	public static void main(String args[])
-	{
-		launch(args);
-	}
+    public static void main(String args[])
+    {
+        launch(args);
+    }
 
-	GridPane grid1, grid2;
-	Scene scene1, scene2;
-	Stage stage_login;
+    GridPane grid1, grid2;
+    Scene scene1, scene2;
+    Stage stage_login;
 
-	public void enterHandler(KeyEvent key, Button button) {
-		if (key.getCode() == KeyCode.ENTER) {
-			button.fire();
-		}
-	}
+    public void enterHandler(KeyEvent key, Button button) {
+        if (key.getCode() == KeyCode.ENTER) {
+            button.fire();
+        }
+    }
 
-	public void dialogHandler(ActionEvent e, Text output) {
-		final Stage dialog = new Stage();
-		dialog.initModality(Modality.WINDOW_MODAL);
+    public void dialogHandler(ActionEvent e, Text output) {
+        final Stage dialog = new Stage();
+        dialog.initModality(Modality.WINDOW_MODAL);
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -59,13 +59,13 @@ public class Main extends Application {
 
         Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
 
-		Button ok = new Button("Ok");
-		Button cancel = new Button("Cancel");
+        Button ok = new Button("Ok");
+        Button cancel = new Button("Cancel");
 
         grid.add(ok, 0, 1);
         grid.add(cancel, 1, 1);
 
-		dialog.setScene(scene);
+        dialog.setScene(scene);
 
         dialog.setWidth(POPUP_WIDTH);
         dialog.setHeight(POPUP_HEIGHT);
@@ -73,87 +73,89 @@ public class Main extends Application {
         dialog.setMinHeight(POPUP_HEIGHT);
         dialog.setResizable(false);
 
-		dialog.show();
-	}
+        scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
 
-	public void start(Stage primaryStage)
-	{
-		stage_login = primaryStage;
+        dialog.show();
+    }
 
-		stage_login.setTitle("JavaFX Welcome");
+    public void start(Stage primaryStage)
+    {
+        stage_login = primaryStage;
 
-		GridPane grid = new GridPane();
-		grid.setAlignment(Pos.CENTER);
+        stage_login.setTitle("JavaFX Welcome");
 
-		grid.setHgap(10);
-		grid.setVgap(10);
-		grid.setPadding(new Insets(25, 25, 25, 25));
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
 
-		Text scenetitle = new Text("Welcome");
-		scenetitle.setId("welcome-text");
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
 
-		Scene scene = new Scene(grid, 300, 275);
-		grid.add(scenetitle, 0, 0, 2, 1);
+        Text scenetitle = new Text("Welcome");
+        scenetitle.setId("welcome-text");
 
-		Label userName = new Label("User Name:");
-		grid.add(userName, 0, 1);
+        Scene scene = new Scene(grid, 300, 275);
+        grid.add(scenetitle, 0, 0, 2, 1);
 
-		TextField userTextField = new TextField();
-		grid.add(userTextField, 1, 1);
+        Label userName = new Label("User Name:");
+        grid.add(userName, 0, 1);
 
-		Label password = new Label("Password");
-		grid.add(password, 0, 2);
+        TextField userTextField = new TextField();
+        grid.add(userTextField, 1, 1);
 
-		PasswordField passwordBox = new PasswordField();
-		grid.add(passwordBox, 1, 2);
+        Label password = new Label("Password");
+        grid.add(password, 0, 2);
 
-
-		Button signIn = new Button("Sign in");
-		HBox hbButton = new HBox(10);
-		hbButton.setAlignment(Pos.BOTTOM_RIGHT);
-		hbButton.getChildren().add(signIn);
-		grid.add(hbButton, 1, 4);
-
-		final Text actiontarget = new Text();
-		grid.add(actiontarget, 1, 6);
-		actiontarget.setId("actiontarget");
+        PasswordField passwordBox = new PasswordField();
+        grid.add(passwordBox, 1, 2);
 
 
-		/* Set up listener that fire the sign in button if ENTER is pressed in
-		 * any text field and the button. */
-		userTextField.setOnKeyPressed(e-> enterHandler(e, signIn));
-		passwordBox.setOnKeyPressed(e-> enterHandler(e, signIn));
-		signIn.setOnKeyPressed(e-> enterHandler(e, signIn));
+        Button signIn = new Button("Sign in");
+        HBox hbButton = new HBox(10);
+        hbButton.setAlignment(Pos.BOTTOM_RIGHT);
+        hbButton.getChildren().add(signIn);
+        grid.add(hbButton, 1, 4);
 
-		String str_user = "a";
-		String str_password = "a";
+        final Text actiontarget = new Text();
+        grid.add(actiontarget, 1, 6);
+        actiontarget.setId("actiontarget");
 
-		signIn.setOnAction(new EventHandler<ActionEvent>() {
 
-			public void handle(ActionEvent e) {
-				String inp_user = userTextField.getText();
-				String inp_password= passwordBox.getText();
+        /* Set up listener that fire the sign in button if ENTER is pressed in
+         * any text field and the button. */
+        userTextField.setOnKeyPressed(e-> enterHandler(e, signIn));
+        passwordBox.setOnKeyPressed(e-> enterHandler(e, signIn));
+        signIn.setOnKeyPressed(e-> enterHandler(e, signIn));
 
-				if (!inp_user.equals(str_user) || !inp_password.equals(str_password)) {
-					actiontarget.setText("Wrong password/user.");
-				} else {
-					actiontarget.setText("Welcome "+ inp_user + ".");
-				}
-			}
-		});
+        String str_user = "a";
+        String str_password = "a";
 
-		Button dialog = new Button("Add user");
-		grid.add(dialog, 0, 10);
-		dialog.setOnAction(e-> dialogHandler(e, actiontarget));
+        signIn.setOnAction(new EventHandler<ActionEvent>() {
 
-		scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
+            public void handle(ActionEvent e) {
+                String inp_user = userTextField.getText();
+                String inp_password= passwordBox.getText();
 
-		stage_login.setScene(scene);
+                if (!inp_user.equals(str_user) || !inp_password.equals(str_password)) {
+                    actiontarget.setText("Wrong password/user.");
+                } else {
+                    actiontarget.setText("Welcome "+ inp_user + ".");
+                }
+            }
+        });
+
+        Button dialog = new Button("Add user");
+        grid.add(dialog, 0, 10);
+        dialog.setOnAction(e-> dialogHandler(e, actiontarget));
+
+        scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
+
+        stage_login.setScene(scene);
         stage_login.setWidth(LOGIN_WIDTH);
         stage_login.setHeight(LOGIN_HEIGHT);
         stage_login.setMinWidth(LOGIN_WIDTH);
         stage_login.setMinHeight(LOGIN_HEIGHT);
         stage_login.setResizable(false);
-		stage_login.show();
-	}
+        stage_login.show();
+    }
 }
