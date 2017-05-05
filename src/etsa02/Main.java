@@ -48,7 +48,8 @@ public class Main extends Application {
 
     public void dialogHandler(ActionEvent e, Text output) {
         final Stage dialog = new Stage();
-        dialog.initModality(Modality.WINDOW_MODAL);
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.setTitle("New User");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
