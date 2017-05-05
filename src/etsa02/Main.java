@@ -22,7 +22,16 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
 
-	public static void main(String args[]) 
+    int POPUP_HEIGHT = 200;
+    int POPUP_WIDTH = 200;
+
+    int LOGIN_HEIGHT = 400;
+    int LOGIN_WIDTH = 800;
+
+    int MAIN_HEIGHT = 200;
+    int MAIN_WIDTH = 200;
+
+	public static void main(String args[])
 	{
 		launch(args);
 	}
@@ -140,6 +149,11 @@ public class Main extends Application {
 		scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
 
 		stage_login.setScene(scene);
+        stage_login.setWidth(LOGIN_WIDTH);
+        stage_login.setHeight(LOGIN_HEIGHT);
+        stage_login.setMinWidth(LOGIN_WIDTH);
+        stage_login.setMinHeight(LOGIN_HEIGHT);
+        stage_login.setResizable(false);
 		stage_login.show();
 	}
 }
