@@ -38,7 +38,7 @@ public class Main extends Application {
 
     GridPane grid1, grid2;
     Scene scene1, scene2;
-    Stage stage_login;
+    Stage stage_main;
 
     public void enterHandler(KeyEvent key, Button button) {
         if (key.getCode() == KeyCode.ENTER) {
@@ -47,9 +47,17 @@ public class Main extends Application {
     }
 
     public void dialogHandler(ActionEvent e, Text output) {
+
         final Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle("New User");
+
+        dialog.setWidth(POPUP_WIDTH);
+        dialog.setHeight(POPUP_HEIGHT);
+        dialog.setMinWidth(POPUP_WIDTH);
+        dialog.setMinHeight(POPUP_HEIGHT);
+        dialog.setResizable(false);
+
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -59,7 +67,6 @@ public class Main extends Application {
         grid.setPadding(new Insets(25, 25, 25, 25));
 
         Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
-
         Label label_name = new Label("Name");
         TextField field_name = new TextField();
         grid.add(label_name, 0, 0);
@@ -93,34 +100,17 @@ public class Main extends Application {
 
         dialog.setScene(scene);
 
-        dialog.setWidth(POPUP_WIDTH);
-        dialog.setHeight(POPUP_HEIGHT);
-        dialog.setMinWidth(POPUP_WIDTH);
-        dialog.setMinHeight(POPUP_HEIGHT);
-        dialog.setResizable(false);
-
         scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
 
         dialog.show();
     }
 
-    public void start(Stage primaryStage)
-    {
-        stage_login = primaryStage;
-
-        stage_login.setTitle("JavaFX Welcome");
-
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+    public Scene setup_login_scene(GridPane grid) {
 
         Text scenetitle = new Text("Welcome");
         scenetitle.setId("welcome-text");
 
-        Scene scene = new Scene(grid, 300, 275);
+        Scene login_scene = new Scene(grid, 300, 275);
         grid.add(scenetitle, 0, 0, 2, 1);
 
         Label userName = new Label("User Name:");
@@ -174,14 +164,31 @@ public class Main extends Application {
         grid.add(dialog, 0, 10);
         dialog.setOnAction(e-> dialogHandler(e, actiontarget));
 
-        scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
+        login_scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
 
-        stage_login.setScene(scene);
-        stage_login.setWidth(LOGIN_WIDTH);
-        stage_login.setHeight(LOGIN_HEIGHT);
-        stage_login.setMinWidth(LOGIN_WIDTH);
-        stage_login.setMinHeight(LOGIN_HEIGHT);
-        stage_login.setResizable(false);
-        stage_login.show();
+        return login_scene;
+    }
+
+    public void start(Stage primaryStage)
+    {
+        stage_main = primaryStage;
+        stage_main.setWidth(LOGIN_WIDTH);
+        stage_main.setHeight(LOGIN_HEIGHT);
+        stage_main.setMinWidth(LOGIN_WIDTH);
+        stage_main.setMinHeight(LOGIN_HEIGHT);
+        stage_main.setResizable(false);
+
+        stage_main.setTitle("JavaFX Welcome");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Scene login_scene = setup_login_scene(grid);
+        stage_main.setScene(login_scene);
+        stage_main.show();
     }
 }
