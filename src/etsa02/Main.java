@@ -23,6 +23,12 @@ public class Main extends Application {
 		launch(args);
 	}
 	
+	public void enterHandler(KeyEvent key, Button button) {
+		if (key.getCode() == KeyCode.ENTER) {
+			button.fire();
+		}
+	}
+	
 	public void start(Stage primaryStage)
 	{
 		primaryStage.setTitle("JavaFX Welcome");
@@ -66,29 +72,9 @@ public class Main extends Application {
 
 		/* Set up listener that fire the sign in button if ENTER is pressed in
 		 * any text field and the button. */
-		userTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent key){
-				if (key.getCode() == KeyCode.ENTER) {
-					signIn.fire();
-				}
-			}
-		});
-
-		passwordBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent key){
-				if (key.getCode() == KeyCode.ENTER) {
-					signIn.fire();
-				}
-			}
-		});
-
-		signIn.setOnKeyPressed(new EventHandler<KeyEvent>() {
-			public void handle(KeyEvent key){
-				if (key.getCode() == KeyCode.ENTER) {
-					signIn.fire();
-				}
-			}
-		});
+		userTextField.setOnKeyPressed(e-> enterHandler(e, signIn));
+		passwordBox.setOnKeyPressed(e-> enterHandler(e, signIn));
+		signIn.setOnKeyPressed(e-> enterHandler(e, signIn));
 
 		String str_user = "a";
 		String str_password = "a";
