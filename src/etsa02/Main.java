@@ -63,14 +63,9 @@ public class Main extends Application {
 		grid.add(actiontarget, 1, 6);
 		actiontarget.setId("actiontarget");
 		
-		signIn.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent e) {
-				actiontarget.setText("Sign in button pressed.");
-			}
-		});
 
 		/* Set up listener that fire the sign in button if ENTER is pressed in
-		 * any text field. */
+		 * any text field and the button. */
 		userTextField.setOnKeyPressed(new EventHandler<KeyEvent>() {
 			public void handle(KeyEvent key){
 				if (key.getCode() == KeyCode.ENTER) {
@@ -84,6 +79,21 @@ public class Main extends Application {
 				if (key.getCode() == KeyCode.ENTER) {
 					signIn.fire();
 				}
+			}
+		});
+
+		signIn.setOnKeyPressed(new EventHandler<KeyEvent>() {
+			public void handle(KeyEvent key){
+				if (key.getCode() == KeyCode.ENTER) {
+					signIn.fire();
+				}
+			}
+		});
+
+
+		signIn.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				actiontarget.setText("Sign in button pressed.");
 			}
 		});
 		
