@@ -59,11 +59,36 @@ public class Main extends Application {
 
         Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
 
+        Label label_name = new Label("Name");
+        TextField field_name = new TextField();
+        grid.add(label_name, 1, 0);
+        grid.add(field_name, 0, 0);
+
+        Label label_ssn = new Label("SSN");
+        TextField field_ssn = new TextField();
+        grid.add(label_ssn, 1, 1);
+        grid.add(field_ssn, 0, 1);
+
+        Label label_address = new Label("Address");
+        TextField field_address = new TextField();
+        grid.add(label_address, 1, 2);
+        grid.add(field_address, 0, 2);
+
+        Label label_phone = new Label("Phone");
+        TextField field_phone = new TextField();
+        grid.add(label_phone, 1, 3);
+        grid.add(field_phone, 0, 3);
+
+        Label label_email = new Label("Email");
+        TextField field_email = new TextField();
+        grid.add(label_email, 1, 4);
+        grid.add(field_email, 0, 4);
+
         Button ok = new Button("Ok");
         Button cancel = new Button("Cancel");
 
-        grid.add(ok, 0, 1);
-        grid.add(cancel, 1, 1);
+        grid.add(cancel, 0, 6);
+        grid.add(ok, 1, 6);
 
         dialog.setScene(scene);
 
