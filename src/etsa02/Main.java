@@ -14,24 +14,65 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBoxBuilder;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Main extends Application {
+
+
 	public static void main(String args[]) 
 	{
 		launch(args);
 	}
 	
+	GridPane grid1, grid2;
+	Scene scene1, scene2;
+	Stage stage_login;
+
 	public void enterHandler(KeyEvent key, Button button) {
 		if (key.getCode() == KeyCode.ENTER) {
 			button.fire();
 		}
 	}
+
+	public void dialogHandler(ActionEvent e, Text output) {
+		final Stage dialog = new Stage();
+		dialog.initModality(Modality.WINDOW_MODAL);
+		
+		Button ok = new Button("Ok");
+		Button cancel = new Button("Cancel");
+		
+		ok.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e) {
+				output.setText("User added.");
+				dialog.close();
+			}
+		});
+
+		cancel.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent e) {
+				output.setText("Operation Canceled.");
+				dialog.close();
+			}
+		});
+		
+		@SuppressWarnings("deprecation")
+		Scene dialogScene = new Scene(VBoxBuilder.create()
+				.children(new Text("Create user."), ok, cancel)
+				.alignment(Pos.CENTER)
+				.padding(new Insets(10))
+				.build());
+		dialog.setScene(dialogScene);
+		dialog.show();
+	}
 	
 	public void start(Stage primaryStage)
 	{
-		primaryStage.setTitle("JavaFX Welcome");
+		stage_login = primaryStage;
+
+		stage_login.setTitle("JavaFX Welcome");
 		
 		GridPane grid = new GridPane();
 		grid.setAlignment(Pos.CENTER);
@@ -93,9 +134,13 @@ public class Main extends Application {
 			}
 		});
 		
+		Button dialog = new Button("Add user");
+		grid.add(dialog, 0, 10);
+		dialog.setOnAction(e-> dialogHandler(e, actiontarget));
+		
 		scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
 
-		primaryStage.setScene(scene);
-		primaryStage.show();
+		stage_login.setScene(scene);
+		stage_login.show();
 	}
 }
