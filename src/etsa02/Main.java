@@ -90,10 +90,20 @@ public class Main extends Application {
 			}
 		});
 
+		String str_user = "a";
+		String str_password = "a";
 
 		signIn.setOnAction(new EventHandler<ActionEvent>() {
+
 			public void handle(ActionEvent e) {
-				actiontarget.setText("Sign in button pressed.");
+				String inp_user = userTextField.getText();
+				String inp_password= passwordBox.getText();
+				
+				if (!inp_user.equals(str_user) || !inp_password.equals(str_password)) {
+					actiontarget.setText("Wrong password/user.");
+				} else {
+					actiontarget.setText("Welcome "+ inp_user + ".");
+				}
 			}
 		});
 		
