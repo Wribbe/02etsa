@@ -22,8 +22,8 @@ import javafx.stage.Stage;
 public class Main extends Application {
 
 
-    int POPUP_HEIGHT = 200;
-    int POPUP_WIDTH = 200;
+    int POPUP_HEIGHT = 300;
+    int POPUP_WIDTH = 300;
 
     int LOGIN_HEIGHT = 400;
     int LOGIN_WIDTH = 800;
@@ -61,28 +61,28 @@ public class Main extends Application {
 
         Label label_name = new Label("Name");
         TextField field_name = new TextField();
-        grid.add(label_name, 1, 0);
-        grid.add(field_name, 0, 0);
+        grid.add(label_name, 0, 0);
+        grid.add(field_name, 1, 0);
 
         Label label_ssn = new Label("SSN");
         TextField field_ssn = new TextField();
-        grid.add(label_ssn, 1, 1);
-        grid.add(field_ssn, 0, 1);
+        grid.add(label_ssn, 0, 1);
+        grid.add(field_ssn, 1, 1);
 
         Label label_address = new Label("Address");
         TextField field_address = new TextField();
-        grid.add(label_address, 1, 2);
-        grid.add(field_address, 0, 2);
+        grid.add(label_address, 0, 2);
+        grid.add(field_address, 1, 2);
 
         Label label_phone = new Label("Phone");
         TextField field_phone = new TextField();
-        grid.add(label_phone, 1, 3);
-        grid.add(field_phone, 0, 3);
+        grid.add(label_phone, 0, 3);
+        grid.add(field_phone, 1, 3);
 
         Label label_email = new Label("Email");
         TextField field_email = new TextField();
-        grid.add(label_email, 1, 4);
-        grid.add(field_email, 0, 4);
+        grid.add(label_email, 0, 4);
+        grid.add(field_email, 1, 4);
 
         Button ok = new Button("Ok");
         Button cancel = new Button("Cancel");
