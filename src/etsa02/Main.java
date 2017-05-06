@@ -45,7 +45,7 @@ public class Main extends Application {
         }
     }
 
-    public void dialogHandler(ActionEvent e, Text output) {
+    public void popup_handler(ActionEvent e, Text output) {
 
         final Stage dialog = new Stage();
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -169,9 +169,9 @@ public class Main extends Application {
             }
         });
 
-        Button dialog = new Button("Add user");
-        grid.add(dialog, 0, 10);
-        dialog.setOnAction(e-> dialogHandler(e, actiontarget));
+        Button button_add_user = new Button("Add user");
+        grid.add(button_add_user, 0, 10);
+        button_add_user.setOnAction(e-> popup_handler(e, actiontarget));
 
         set_style(login_scene);
 
@@ -182,9 +182,27 @@ public class Main extends Application {
 
         GridPane grid = get_grid();
         Scene main_scene = new Scene(grid, MAIN_WIDTH, MAIN_HEIGHT);
-        Text sceneTitle = new Text("MAIN");
 
+        Text sceneTitle = new Text("MAIN");
         grid.add(sceneTitle, 0, 0);
+
+        Button button_new_user = new Button("New user");
+        grid.add(button_new_user, 1, 1);
+
+        Button button_edit_user = new Button("Edit user");
+        grid.add(button_edit_user, 1, 2);
+
+        Button button_remove_user = new Button("Remove user");
+        grid.add(button_remove_user, 1, 3);
+
+        Button button_add_bike = new Button("Add bike");
+        grid.add(button_add_bike, 1, 4);
+
+        Button button_remove_bike = new Button("Remove bike");
+        grid.add(button_remove_bike, 1, 5);
+
+        Button button_print_barcode = new Button("Print barcode");
+        grid.add(button_print_barcode, 1, 6);
 
         set_style(main_scene);
         return main_scene;

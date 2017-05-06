@@ -1,4 +1,6 @@
-def main():
+import sys
+
+def gen_dialog_buttons():
 
     labels = ["Name", "SSN", "Address", "Phone", "Email"]
     for index, label in enumerate(labels):
@@ -12,5 +14,36 @@ def main():
         print("grid.add({}, 1, {});".format(field_name, index))
         print("")
 
+def gen_main_buttons():
+
+    names = [
+            "New user",
+            "Edit user",
+            "Remove user",
+            "Add bike",
+            "Remove bike",
+            "Print barcode",
+            ]
+
+    def format_name(string):
+        return string.replace(" ","_").lower()
+
+    for index, name in enumerate(names, start=1):
+
+        name_button = "button_{}".format(format_name(name))
+        print("Button {} = new Button(\"{}\");".format(name_button,
+                                                   name))
+        print("grid.add({}, 1, {});".format(name_button, index))
+        print("")
+
+
+def main(args):
+
+    if "popup" in args:
+        gen_dialog_buttons()
+    elif "main" in args:
+        gen_main_buttons()
+
+
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])
