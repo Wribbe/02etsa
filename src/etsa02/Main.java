@@ -103,6 +103,12 @@ public class Main extends Application {
         dialog.show();
     }
 
+    public void set_style(Scene scene)
+    {
+        String resource = Main.class.getResource("login.css").toExternalForm();
+        scene.getStylesheets().add(resource);
+    }
+
     public Scene setup_login_scene(Stage stage_main) {
 
 
@@ -167,7 +173,7 @@ public class Main extends Application {
         grid.add(dialog, 0, 10);
         dialog.setOnAction(e-> dialogHandler(e, actiontarget));
 
-        login_scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
+        set_style(login_scene);
 
         return login_scene;
     }
@@ -180,7 +186,9 @@ public class Main extends Application {
 
         grid.add(sceneTitle, 0, 0);
 
+        set_style(main_scene);
         return main_scene;
+
     }
 
     public GridPane get_grid()
