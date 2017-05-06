@@ -36,8 +36,7 @@ public class Main extends Application {
         launch(args);
     }
 
-    GridPane grid1, grid2;
-    Scene scene1, scene2;
+    Scene login_scene, main_scene;
     Stage stage_main;
 
     public void enterHandler(KeyEvent key, Button button) {
@@ -57,7 +56,6 @@ public class Main extends Application {
         dialog.setMinWidth(POPUP_WIDTH);
         dialog.setMinHeight(POPUP_HEIGHT);
         dialog.setResizable(false);
-
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -105,12 +103,15 @@ public class Main extends Application {
         dialog.show();
     }
 
-    public Scene setup_login_scene(GridPane grid) {
+    public Scene setup_login_scene(Stage stage_main) {
+
+
+        GridPane grid = get_grid();
 
         Text scenetitle = new Text("Welcome");
         scenetitle.setId("welcome-text");
 
-        Scene login_scene = new Scene(grid, 300, 275);
+        Scene login_scene = new Scene(grid, MAIN_WIDTH, MAIN_HEIGHT);
         grid.add(scenetitle, 0, 0, 2, 1);
 
         Label userName = new Label("User Name:");
@@ -156,6 +157,8 @@ public class Main extends Application {
                     actiontarget.setText("Wrong password/user.");
                 } else {
                     actiontarget.setText("Welcome "+ inp_user + ".");
+                    stage_main.setScene(main_scene);
+                    stage_main.show();
                 }
             }
         });
@@ -169,6 +172,28 @@ public class Main extends Application {
         return login_scene;
     }
 
+    public Scene setup_main_scene(Stage stage_main) {
+
+        GridPane grid = get_grid();
+        Scene main_scene = new Scene(grid, MAIN_WIDTH, MAIN_HEIGHT);
+        Text sceneTitle = new Text("MAIN");
+
+        grid.add(sceneTitle, 0, 0);
+
+        return main_scene;
+    }
+
+    public GridPane get_grid()
+    {
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+        return grid;
+    }
+
     public void start(Stage primaryStage)
     {
         stage_main = primaryStage;
@@ -180,14 +205,9 @@ public class Main extends Application {
 
         stage_main.setTitle("JavaFX Welcome");
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
+        login_scene = setup_login_scene(stage_main);
+        main_scene = setup_main_scene(stage_main);
 
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-
-        Scene login_scene = setup_login_scene(grid);
         stage_main.setScene(login_scene);
         stage_main.show();
     }
