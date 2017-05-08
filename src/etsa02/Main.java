@@ -25,6 +25,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.ArrayList;
+
 public class Main extends Application {
 
 
@@ -43,11 +45,45 @@ public class Main extends Application {
         launch(args);
     }
 
-    public void action_output(Button button, Text target, String output)
+    private interface ButtonAction
+    {
+      public void fire();
+    }
+
+    private class ButtonOutput implements ButtonAction {
+      private String text = "";
+      private Text output;
+
+      public ButtonOutput(String text, Text output) {
+        this.text = text;
+        this.output = output;
+      }
+
+      public void fire() {
+        output.setText(text);
+      }
+    }
+
+    private class ButtonClose implements ButtonAction {
+
+      private Stage stage;
+
+      public ButtonClose(Stage stage) {
+        this.stage = stage;
+      }
+
+      public void fire() {
+        stage.close();
+      }
+    }
+
+    public void actions_button_set(Button button, ArrayList<ButtonAction> actions)
     {
         button.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                target.setText(output);
+              for (ButtonAction action : actions) {
+                action.fire();
+              }
             }
         }
     );}
@@ -101,10 +137,14 @@ public class Main extends Application {
         grid.add(label_email, 0, 4);
         grid.add(field_email, 1, 4);
 
+        // Set up cancel actions.
+        ArrayList<ButtonAction> cancel_actions = new ArrayList<ButtonAction>();
+        cancel_actions.add(new ButtonOutput("New user operation canceled.", output));
+        cancel_actions.add(new ButtonClose(dialog));
+
         Button ok = new Button("Ok");
-        action_output(ok, output, "User added.");
         Button cancel = new Button("Cancel");
-        action_output(cancel, output, "Operation aborted.");
+        actions_button_set(cancel, cancel_actions);
 
         grid.add(cancel, 0, 6);
         grid.add(ok, 1, 6);
