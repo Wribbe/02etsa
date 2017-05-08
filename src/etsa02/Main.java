@@ -184,7 +184,7 @@ public class Main extends Application {
     public Scene setup_main_scene(Stage stage_main) {
 
         GridPane main_grid = get_grid();
-        GridPane button_grid = get_grid();
+        GridPane button_grid = get_grid(Pos.TOP_LEFT);
         GridPane list_grid = get_grid();
 
         Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
@@ -200,33 +200,29 @@ public class Main extends Application {
         list.setItems(data);
         list_grid.add(list, 0, 0);
 
-        // Set heading.
-        Text sceneTitle = new Text("MAIN");
-        button_grid.add(sceneTitle, 1, 0);
-
         // Create statusbar and label.
         Label status_label = new Label("Status:");
         Text status_bar = new Text();
 
         // Set buttons.
         Button button_new_user = new Button("New user");
-        button_grid.add(button_new_user, 1, 1);
+        button_grid.add(button_new_user, 1, 0);
         button_new_user.setOnAction(e-> popup_handler(e, status_bar));
 
         Button button_edit_user = new Button("Edit user");
-        button_grid.add(button_edit_user, 1, 2);
+        button_grid.add(button_edit_user, 1, 1);
 
         Button button_remove_user = new Button("Remove user");
-        button_grid.add(button_remove_user, 1, 3);
+        button_grid.add(button_remove_user, 1, 2);
 
         Button button_add_bike = new Button("Add bike");
-        button_grid.add(button_add_bike, 1, 4);
+        button_grid.add(button_add_bike, 1, 3);
 
         Button button_remove_bike = new Button("Remove bike");
-        button_grid.add(button_remove_bike, 1, 5);
+        button_grid.add(button_remove_bike, 1, 4);
 
         Button button_print_barcode = new Button("Print barcode");
-        button_grid.add(button_print_barcode, 1, 6);
+        button_grid.add(button_print_barcode, 1, 5);
 
         // Add button grid to main grid.
         main_grid.add(button_grid, 1, 0);
@@ -250,9 +246,9 @@ public class Main extends Application {
         GridPane grid = new GridPane();
         grid.setAlignment(position);
 
-        grid.setHgap(10);
+        grid.setHgap(2);
         grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        grid.setPadding(new Insets(5, 5, 5, 5));
         return grid;
     }
 
