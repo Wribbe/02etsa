@@ -1,6 +1,10 @@
 package etsa02;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -10,11 +14,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ListCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBoxBuilder;
+import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -59,6 +65,7 @@ public class Main extends Application {
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
+        output.setText("Test");
 
         grid.setHgap(10);
         grid.setVgap(10);
@@ -169,10 +176,6 @@ public class Main extends Application {
             }
         });
 
-        Button button_add_user = new Button("Add user");
-        grid.add(button_add_user, 0, 10);
-        button_add_user.setOnAction(e-> popup_handler(e, actiontarget));
-
         set_style(login_scene);
 
         return login_scene;
@@ -180,44 +183,82 @@ public class Main extends Application {
 
     public Scene setup_main_scene(Stage stage_main) {
 
-        GridPane grid = get_grid();
-        Scene main_scene = new Scene(grid, MAIN_WIDTH, MAIN_HEIGHT);
+        GridPane main_grid = get_grid();
+        GridPane button_grid = get_grid();
+        GridPane list_grid = get_grid();
 
+        Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
+
+        // Set list of users.
+        ObservableList<String> data = FXCollections.observableArrayList(
+                    "A",
+                    "B",
+                    "C"
+                );
+
+        ListView<String> list = new ListView<String>();
+        list.setItems(data);
+        list_grid.add(list, 0, 0);
+
+        // Set heading.
         Text sceneTitle = new Text("MAIN");
-        grid.add(sceneTitle, 0, 0);
+        button_grid.add(sceneTitle, 1, 0);
 
+        // Create statusbar and label.
+        Label status_label = new Label("Status:");
+        Text status_bar = new Text();
+
+        // Set buttons.
         Button button_new_user = new Button("New user");
-        grid.add(button_new_user, 1, 1);
+        button_grid.add(button_new_user, 1, 1);
+        button_new_user.setOnAction(e-> popup_handler(e, status_bar));
 
         Button button_edit_user = new Button("Edit user");
-        grid.add(button_edit_user, 1, 2);
+        button_grid.add(button_edit_user, 1, 2);
 
         Button button_remove_user = new Button("Remove user");
-        grid.add(button_remove_user, 1, 3);
+        button_grid.add(button_remove_user, 1, 3);
 
         Button button_add_bike = new Button("Add bike");
-        grid.add(button_add_bike, 1, 4);
+        button_grid.add(button_add_bike, 1, 4);
 
         Button button_remove_bike = new Button("Remove bike");
-        grid.add(button_remove_bike, 1, 5);
+        button_grid.add(button_remove_bike, 1, 5);
 
         Button button_print_barcode = new Button("Print barcode");
-        grid.add(button_print_barcode, 1, 6);
+        button_grid.add(button_print_barcode, 1, 6);
 
+        // Add button grid to main grid.
+        main_grid.add(button_grid, 1, 0);
+
+        // Add list grid to main grid.
+        main_grid.add(list_grid, 0, 0);
+
+        // Add statusbar to main grid.
+        GridPane status_grid = get_grid(Pos.TOP_LEFT);
+        status_grid.add(status_label, 0, 0);
+        status_grid.add(status_bar, 1, 0);
+        main_grid.add(status_grid, 0, 1);
+
+        // Set window style.
         set_style(main_scene);
         return main_scene;
-
     }
 
-    public GridPane get_grid()
+    public GridPane get_grid(Pos position)
     {
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
+        grid.setAlignment(position);
 
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
         return grid;
+    }
+
+    public GridPane get_grid()
+    {
+        return get_grid(Pos.CENTER);
     }
 
     public void start(Stage primaryStage)
