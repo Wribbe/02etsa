@@ -33,6 +33,9 @@ import java.util.LinkedList;
 
 public class Main extends Application {
 
+    BikeOwner global_selected_owner = null;
+    Bike global_selected_bike = null;
+
 
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
@@ -352,6 +355,27 @@ public class Main extends Application {
           users.getChildren().add(item);
         }
         list_grid.add(view_root, 0, 0);
+
+        // Set listener.
+        view_root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ListElement>>() {
+            public void changed(ObservableValue<? extends TreeItem<ListElement>> observable,
+                                TreeItem<ListElement> value_old, TreeItem<ListElement> value_new) {
+
+                ListElement element = value_new.getValue();
+
+                if (element instanceof BikeOwner) {
+                    global_selected_owner = (BikeOwner)element;
+                    global_selected_bike = null;
+                } else if (element instanceof Bike) {
+                    global_selected_owner = null;
+                    global_selected_bike = (Bike)element;
+                } else {
+                    global_selected_owner = null;
+                    global_selected_bike = null;
+                    System.out.println("Don't know what you clicked.");
+                }
+            }
+        });
 
         // Create statusbar and label.
         Label status_label = new Label("Status:");
