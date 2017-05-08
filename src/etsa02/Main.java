@@ -104,6 +104,16 @@ public class Main extends Application {
         }
     }
 
+    private class OurTextField extends TextField {
+
+      private OurButton button;
+
+      public OurTextField(OurButton button) {
+        super();
+        this.setOnKeyPressed(e-> enterHandler(e, button));
+      }
+    }
+
     public void popup_handler(ActionEvent e, Text output) {
 
         final Stage dialog = new Stage();
@@ -117,32 +127,6 @@ public class Main extends Application {
         dialog.setResizable(false);
 
         GridPane grid = get_grid();
-
-        Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
-        Label label_name = new Label("Name");
-        TextField field_name = new TextField();
-        grid.add(label_name, 0, 0);
-        grid.add(field_name, 1, 0);
-
-        Label label_ssn = new Label("SSN");
-        TextField field_ssn = new TextField();
-        grid.add(label_ssn, 0, 1);
-        grid.add(field_ssn, 1, 1);
-
-        Label label_address = new Label("Address");
-        TextField field_address = new TextField();
-        grid.add(label_address, 0, 2);
-        grid.add(field_address, 1, 2);
-
-        Label label_phone = new Label("Phone");
-        TextField field_phone = new TextField();
-        grid.add(label_phone, 0, 3);
-        grid.add(field_phone, 1, 3);
-
-        Label label_email = new Label("Email");
-        TextField field_email = new TextField();
-        grid.add(label_email, 0, 4);
-        grid.add(field_email, 1, 4);
 
         // Create ok and cancel button.
         OurButton ok = new OurButton("Ok");
@@ -163,6 +147,32 @@ public class Main extends Application {
         grid.add(cancel, 0, 6);
         grid.add(ok, 1, 6);
 
+        Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
+        Label label_name = new Label("Name");
+        OurTextField field_name = new OurTextField(ok);
+        grid.add(label_name, 0, 0);
+        grid.add(field_name, 1, 0);
+
+        Label label_ssn = new Label("SSN");
+        OurTextField field_ssn = new OurTextField(ok);
+        grid.add(label_ssn, 0, 1);
+        grid.add(field_ssn, 1, 1);
+
+        Label label_address = new Label("Address");
+        OurTextField field_address = new OurTextField(ok);
+        grid.add(label_address, 0, 2);
+        grid.add(field_address, 1, 2);
+
+        Label label_phone = new Label("Phone");
+        OurTextField field_phone = new OurTextField(ok);
+        grid.add(label_phone, 0, 3);
+        grid.add(field_phone, 1, 3);
+
+        Label label_email = new Label("Email");
+        OurTextField field_email = new OurTextField(ok);
+        grid.add(label_email, 0, 4);
+        grid.add(field_email, 1, 4);
+
         dialog.setScene(scene);
 
         scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
@@ -178,27 +188,10 @@ public class Main extends Application {
 
     public Scene setup_login_scene(Stage stage_main) {
 
-
         GridPane grid = get_grid();
 
         Text scenetitle = new Text("Welcome");
         scenetitle.setId("welcome-text");
-
-        Scene login_scene = new Scene(grid, MAIN_WIDTH, MAIN_HEIGHT);
-        grid.add(scenetitle, 0, 0, 2, 1);
-
-        Label userName = new Label("User Name:");
-        grid.add(userName, 0, 1);
-
-        TextField userTextField = new TextField();
-        grid.add(userTextField, 1, 1);
-
-        Label password = new Label("Password:");
-        grid.add(password, 0, 2);
-
-        PasswordField passwordBox = new PasswordField();
-        grid.add(passwordBox, 1, 2);
-
 
         OurButton signIn = new OurButton("Sign in");
         HBox hbButton = new HBox(10);
@@ -206,16 +199,25 @@ public class Main extends Application {
         hbButton.getChildren().add(signIn);
         grid.add(hbButton, 1, 4);
 
+        Scene login_scene = new Scene(grid, MAIN_WIDTH, MAIN_HEIGHT);
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Label userName = new Label("User Name:");
+        grid.add(userName, 0, 1);
+
+        OurTextField userTextField = new OurTextField(signIn);
+        grid.add(userTextField, 1, 1);
+
+        Label password = new Label("Password:");
+        grid.add(password, 0, 2);
+
+        PasswordField passwordBox = new PasswordField();
+        passwordBox.setOnKeyPressed(e-> enterHandler(e, signIn));
+        grid.add(passwordBox, 1, 2);
+
         final Text actiontarget = new Text();
         grid.add(actiontarget, 1, 6);
         actiontarget.setId("actiontarget");
-
-
-        /* Set up listener that fire the sign in button if ENTER is pressed in
-         * any text field and the button. */
-        userTextField.setOnKeyPressed(e-> enterHandler(e, signIn));
-        passwordBox.setOnKeyPressed(e-> enterHandler(e, signIn));
-        signIn.setOnKeyPressed(e-> enterHandler(e, signIn));
 
         String str_user = "a";
         String str_password = "a";
