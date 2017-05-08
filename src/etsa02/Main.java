@@ -16,6 +16,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.TreeView;
+import javafx.scene.control.TreeItem;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
@@ -245,7 +247,11 @@ public class Main extends Application {
         return login_scene;
     }
 
-    private class Bike {
+    private interface ListElement {
+      public String toString();
+    }
+
+    private class Bike implements ListElement {
 
       private String barcode;
       private String make;
@@ -275,9 +281,13 @@ public class Main extends Application {
       public boolean equals(Bike other) {
         return other.barcode().equals(this.barcode);
       }
+
+      public String toString() {
+        return this.barcode;
+      }
     }
 
-    private class BikeOwner {
+    private class BikeOwner implements ListElement {
 
       private String name = "";
       private String ssn;
@@ -324,15 +334,24 @@ public class Main extends Application {
         BikeOwner Bosse = new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
         BikeOwner Cissi = new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
 
-        // Set list of users.
-        ObservableList<BikeOwner> data = FXCollections.observableArrayList(
-            Agda,
-            Bosse,
-            Cissi
-        );
-        ListView<BikeOwner> list = new ListView<BikeOwner>();
-        list.setItems(data);
-        list_grid.add(list, 0, 0);
+        TreeItem<ListElement> TreeItemAgda = new TreeItem<ListElement>(Agda, null);
+
+        // Set up main rootItem.
+        TreeItem<ListElement> users = new TreeItem<ListElement>(Agda, null);
+        TreeView<ListElement> view_root = new TreeView<ListElement>();
+
+        view_root.setRoot(users);
+        view_root.setShowRoot(false);
+
+        for (int i=0; i<100; i++) {
+          TreeItem<ListElement> item = new TreeItem<ListElement>(Agda, null);
+          for (int j=0; j<20; j++) {
+            TreeItem<ListElement> bike = new TreeItem<ListElement>(new Bike("Test"));
+            item.getChildren().add(bike);
+          }
+          users.getChildren().add(item);
+        }
+        list_grid.add(view_root, 0, 0);
 
         // Create statusbar and label.
         Label status_label = new Label("Status:");
@@ -346,11 +365,6 @@ public class Main extends Application {
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
 
-        button_edit_user.setOnAction(new EventHandler<ActionEvent>() {
-          public void handle(ActionEvent e) {
-            data.add(Cissi);
-          }
-        });
         OurButton button_remove_user = new OurButton("Remove user");
         button_grid.add(button_remove_user, 1, 2);
 
