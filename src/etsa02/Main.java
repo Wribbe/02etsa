@@ -33,8 +33,8 @@ import java.util.LinkedList;
 
 public class Main extends Application {
 
-    BikeOwner global_selected_owner = null;
-    Bike global_selected_bike = null;
+    TreeItem global_selected_owner = null;
+    TreeItem global_selected_bike = null;
 
     TreeItem<ListElement> users;
 
@@ -371,11 +371,11 @@ public class Main extends Application {
                 ListElement element = value_new.getValue();
 
                 if (element instanceof BikeOwner) {
-                    global_selected_owner = (BikeOwner)element;
+                    global_selected_owner = value_new;
                     global_selected_bike = null;
                 } else if (element instanceof Bike) {
                     global_selected_owner = null;
-                    global_selected_bike = (Bike)element;
+                    global_selected_bike = value_new;
                 } else {
                     global_selected_owner = null;
                     global_selected_bike = null;
@@ -401,7 +401,15 @@ public class Main extends Application {
         button_grid.add(button_remove_user, 1, 2);
         button_remove_user.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                System.out.println("REMOVE USER!");
+                if (global_selected_owner == null) {
+                    status_bar.setText("Error: Please select a user.");
+                    return;
+                }
+                // Remove the tree item.
+                String removed_name = global_selected_owner.getValue().toString();
+                global_selected_owner.getParent().getChildren().remove(global_selected_owner);
+                global_selected_owner = null;
+                status_bar.setText("Successfully removed: "+removed_name+".");
             }
         });
 
@@ -409,7 +417,11 @@ public class Main extends Application {
         button_grid.add(button_add_bike, 1, 3);
         button_add_bike.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                System.out.println("ADD BIKE!");
+                if (global_selected_owner == null) {
+                    status_bar.setText("Error: Please select a user.");
+                    return;
+                }
+                // Add bike to user.
             }
         });
 
