@@ -63,13 +63,7 @@ public class Main extends Application {
         dialog.setMinHeight(POPUP_HEIGHT);
         dialog.setResizable(false);
 
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        output.setText("Test");
-
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        GridPane grid = get_grid();
 
         Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
         Label label_name = new Label("Name");
