@@ -133,7 +133,7 @@ public class Main extends Application {
         TextField userTextField = new TextField();
         grid.add(userTextField, 1, 1);
 
-        Label password = new Label("Password");
+        Label password = new Label("Password:");
         grid.add(password, 0, 2);
 
         PasswordField passwordBox = new PasswordField();
