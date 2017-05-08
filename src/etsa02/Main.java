@@ -77,7 +77,7 @@ public class Main extends Application {
       }
     }
 
-    public void actions_button_set(Button button, ArrayList<ButtonAction> actions)
+    public void actions_button_set(OurButton button, ArrayList<ButtonAction> actions)
     {
         button.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
@@ -91,7 +91,14 @@ public class Main extends Application {
     Scene login_scene, main_scene;
     Stage stage_main;
 
-    public void enterHandler(KeyEvent key, Button button) {
+    private class OurButton extends Button {
+      public OurButton(String label) {
+        super(label);
+        this.setOnKeyPressed(e-> enterHandler(e, this));
+      }
+    }
+
+    public void enterHandler(KeyEvent key, OurButton button) {
         if (key.getCode() == KeyCode.ENTER) {
             button.fire();
         }
@@ -137,14 +144,21 @@ public class Main extends Application {
         grid.add(label_email, 0, 4);
         grid.add(field_email, 1, 4);
 
-        // Set up cancel actions.
+        // Create ok and cancel button.
+        OurButton ok = new OurButton("Ok");
+        OurButton cancel = new OurButton("Cancel");
+
+        // Set up and add cancel actions.
         ArrayList<ButtonAction> cancel_actions = new ArrayList<ButtonAction>();
         cancel_actions.add(new ButtonOutput("New user operation canceled.", output));
         cancel_actions.add(new ButtonClose(dialog));
-
-        Button ok = new Button("Ok");
-        Button cancel = new Button("Cancel");
         actions_button_set(cancel, cancel_actions);
+
+        // Set up and add ok actions.
+        ArrayList<ButtonAction> ok_actions = new ArrayList<ButtonAction>();
+        ok_actions.add(new ButtonOutput("New user created.", output));
+        ok_actions.add(new ButtonClose(dialog));
+        actions_button_set(ok, ok_actions);
 
         grid.add(cancel, 0, 6);
         grid.add(ok, 1, 6);
@@ -186,7 +200,7 @@ public class Main extends Application {
         grid.add(passwordBox, 1, 2);
 
 
-        Button signIn = new Button("Sign in");
+        OurButton signIn = new OurButton("Sign in");
         HBox hbButton = new HBox(10);
         hbButton.setAlignment(Pos.BOTTOM_RIGHT);
         hbButton.getChildren().add(signIn);
@@ -251,23 +265,23 @@ public class Main extends Application {
         Text status_bar = new Text();
 
         // Set buttons.
-        Button button_new_user = new Button("New user");
+        OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
         button_new_user.setOnAction(e-> popup_handler(e, status_bar));
 
-        Button button_edit_user = new Button("Edit user");
+        OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
 
-        Button button_remove_user = new Button("Remove user");
+        OurButton button_remove_user = new OurButton("Remove user");
         button_grid.add(button_remove_user, 1, 2);
 
-        Button button_add_bike = new Button("Add bike");
+        OurButton button_add_bike = new OurButton("Add bike");
         button_grid.add(button_add_bike, 1, 3);
 
-        Button button_remove_bike = new Button("Remove bike");
+        OurButton button_remove_bike = new OurButton("Remove bike");
         button_grid.add(button_remove_bike, 1, 4);
 
-        Button button_print_barcode = new Button("Print barcode");
+        OurButton button_print_barcode = new OurButton("Print barcode");
         button_grid.add(button_print_barcode, 1, 5);
 
         // Add button grid to main grid.
