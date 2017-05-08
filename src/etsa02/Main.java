@@ -36,6 +36,11 @@ public class Main extends Application {
     BikeOwner global_selected_owner = null;
     Bike global_selected_bike = null;
 
+    TreeItem<ListElement> users;
+
+    BikeOwner Agda = new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
+    BikeOwner Bosse = new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
+    BikeOwner Cissi = new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
 
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
@@ -51,49 +56,6 @@ public class Main extends Application {
     {
         launch(args);
     }
-
-    private interface ButtonAction
-    {
-      public void fire();
-    }
-
-    private class ButtonOutput implements ButtonAction {
-      private String text = "";
-      private Text output;
-
-      public ButtonOutput(String text, Text output) {
-        this.text = text;
-        this.output = output;
-      }
-
-      public void fire() {
-        output.setText(text);
-      }
-    }
-
-    private class ButtonClose implements ButtonAction {
-
-      private Stage stage;
-
-      public ButtonClose(Stage stage) {
-        this.stage = stage;
-      }
-
-      public void fire() {
-        stage.close();
-      }
-    }
-
-    public void actions_button_set(OurButton button, ArrayList<ButtonAction> actions)
-    {
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            public void handle(ActionEvent e) {
-              for (ButtonAction action : actions) {
-                action.fire();
-              }
-            }
-        }
-    );}
 
     Scene login_scene, main_scene;
     Stage stage_main;
@@ -124,8 +86,12 @@ public class Main extends Application {
     private abstract class PopupBase {
 
         protected final Stage dialog = new Stage();
+        protected GridPane grid;
+        protected Text output;
 
         public PopupBase(String title, Text output) {
+
+            this.output = output;
 
             dialog.initModality(Modality.APPLICATION_MODAL);
             dialog.setTitle(title);
@@ -136,23 +102,15 @@ public class Main extends Application {
             dialog.setMinHeight(POPUP_HEIGHT);
             dialog.setResizable(false);
 
-            GridPane grid = get_grid();
+            grid = get_grid();
 
             // Create ok and cancel button.
             OurButton ok = new OurButton("Ok");
             OurButton cancel = new OurButton("Cancel");
 
-            // Set up and add cancel actions.
-            ArrayList<ButtonAction> cancel_actions = new ArrayList<ButtonAction>();
-            cancel_actions.add(new ButtonOutput(status_cancel(), output));
-            cancel_actions.add(new ButtonClose(dialog));
-            actions_button_set(cancel, cancel_actions);
-
-            // Set up and add ok actions.
-            ArrayList<ButtonAction> ok_actions = new ArrayList<ButtonAction>();
-            ok_actions.add(new ButtonOutput(status_ok(), output));
-            ok_actions.add(new ButtonClose(dialog));
-            actions_button_set(ok, ok_actions);
+            // Set ok and cancel actions.
+            ok.setOnAction(action_ok());
+            cancel.setOnAction(action_cancel());
 
             grid.add(cancel, 0, 6);
             grid.add(ok, 1, 6);
@@ -193,6 +151,9 @@ public class Main extends Application {
         public abstract String status_ok();
 
         public abstract String status_cancel();
+
+        public abstract EventHandler<ActionEvent> action_ok();
+        public abstract EventHandler<ActionEvent> action_cancel();
     }
 
     private class PopupNewUser extends PopupBase {
@@ -208,6 +169,29 @@ public class Main extends Application {
         public String status_cancel() {
             return "User creation aborted.";
         }
+        public EventHandler<ActionEvent> action_ok() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    output.setText(status_ok());
+                    add_user(Bosse);
+                    dialog.close();
+                }
+            };
+            return handler;
+        }
+        public EventHandler<ActionEvent> action_cancel() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    output.setText(status_cancel());
+                    dialog.close();
+                }
+            };
+            return handler;
+        }
+    }
+
+    public void add_user(BikeOwner user) {
+        users.getChildren().add(new TreeItem<ListElement>(user));
     }
 
     public void popup_handler(ActionEvent e, PopupBase popup) {
@@ -360,14 +344,10 @@ public class Main extends Application {
 
         Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
 
-        BikeOwner Agda = new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
-        BikeOwner Bosse = new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
-        BikeOwner Cissi = new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
-
         TreeItem<ListElement> TreeItemAgda = new TreeItem<ListElement>(Agda, null);
 
         // Set up main rootItem.
-        TreeItem<ListElement> users = new TreeItem<ListElement>(Agda, null);
+        users = new TreeItem<ListElement>(Agda, null);
         TreeView<ListElement> view_root = new TreeView<ListElement>();
 
         view_root.setRoot(users);
