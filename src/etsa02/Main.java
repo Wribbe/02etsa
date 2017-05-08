@@ -399,15 +399,35 @@ public class Main extends Application {
 
         OurButton button_remove_user = new OurButton("Remove user");
         button_grid.add(button_remove_user, 1, 2);
+        button_remove_user.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                System.out.println("REMOVE USER!");
+            }
+        });
 
         OurButton button_add_bike = new OurButton("Add bike");
         button_grid.add(button_add_bike, 1, 3);
+        button_add_bike.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                System.out.println("ADD BIKE!");
+            }
+        });
 
         OurButton button_remove_bike = new OurButton("Remove bike");
         button_grid.add(button_remove_bike, 1, 4);
+        button_remove_bike.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                System.out.println("REMOVE BIKE!");
+            }
+        });
 
         OurButton button_print_barcode = new OurButton("Print barcode");
         button_grid.add(button_print_barcode, 1, 5);
+        button_print_barcode.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                System.out.println("PRINT BARCODE!");
+            }
+        });
 
         // Add button grid to main grid.
         main_grid.add(button_grid, 1, 0);
