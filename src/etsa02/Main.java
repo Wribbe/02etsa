@@ -346,6 +346,11 @@ public class Main extends Application {
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
 
+        button_edit_user.setOnAction(new EventHandler<ActionEvent>() {
+          public void handle(ActionEvent e) {
+            data.add(Cissi);
+          }
+        });
         OurButton button_remove_user = new OurButton("Remove user");
         button_grid.add(button_remove_user, 1, 2);
 
