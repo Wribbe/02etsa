@@ -1,6 +1,9 @@
 #!/bin/sh
 
-cd etsa02
+directory="$1"
+echo ${directory}
+
+cd ${directory}
 javac Main.java
 compilation_result=$?
 if [ "$compilation_result" != 0 ]; then
@@ -8,4 +11,4 @@ if [ "$compilation_result" != 0 ]; then
     exit
 fi
 cd ..
-java etsa02.Main
+java ${directory}.Main
