@@ -37,10 +37,20 @@ public class Main extends Application {
     int MAIN_HEIGHT = 200;
     int MAIN_WIDTH = 200;
 
+
     public static void main(String args[])
     {
         launch(args);
     }
+
+    public void action_output(Button button, Text target, String output)
+    {
+        button.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                target.setText(output);
+            }
+        }
+    );}
 
     Scene login_scene, main_scene;
     Stage stage_main;
@@ -92,7 +102,9 @@ public class Main extends Application {
         grid.add(field_email, 1, 4);
 
         Button ok = new Button("Ok");
+        action_output(ok, output, "User added.");
         Button cancel = new Button("Cancel");
+        action_output(cancel, output, "Operation aborted.");
 
         grid.add(cancel, 0, 6);
         grid.add(ok, 1, 6);
