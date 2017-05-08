@@ -243,6 +243,31 @@ public class Main extends Application {
         return login_scene;
     }
 
+    private class BikeOwner {
+
+      private String name = "";
+      private String ssn;
+      private String address;
+      private String phone;
+      private String email;
+
+      public BikeOwner(String name,
+                      String ssn,
+                      String address,
+                      String phone,
+                      String email) {
+        this.name = name;
+        this.ssn = ssn;
+        this.address = address;
+        this.phone = phone;
+        this.email = email;
+      }
+
+      public String toString() {
+        return this.name;
+      }
+    }
+
     public Scene setup_main_scene(Stage stage_main) {
 
         GridPane main_grid = get_grid();
@@ -252,13 +277,13 @@ public class Main extends Application {
         Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
 
         // Set list of users.
-        ObservableList<String> data = FXCollections.observableArrayList(
-                    "A",
-                    "B",
-                    "C"
-                );
+        ObservableList<BikeOwner> data = FXCollections.observableArrayList(
+            new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se"),
+            new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234567", "Bosse@email.se"),
+            new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701234567", "Cicci@email.se")
+        );
 
-        ListView<String> list = new ListView<String>();
+        ListView<BikeOwner> list = new ListView<BikeOwner>();
         list.setItems(data);
         list_grid.add(list, 0, 0);
 
