@@ -121,70 +121,97 @@ public class Main extends Application {
       }
     }
 
-    public void popup_handler(ActionEvent e, Text output) {
+    private abstract class PopupBase {
 
-        final Stage dialog = new Stage();
-        dialog.initModality(Modality.APPLICATION_MODAL);
-        dialog.setTitle("New User");
+        protected final Stage dialog = new Stage();
 
-        dialog.setWidth(POPUP_WIDTH);
-        dialog.setHeight(POPUP_HEIGHT);
-        dialog.setMinWidth(POPUP_WIDTH);
-        dialog.setMinHeight(POPUP_HEIGHT);
-        dialog.setResizable(false);
+        public PopupBase(String title, Text output) {
 
-        GridPane grid = get_grid();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.setTitle(title);
 
-        // Create ok and cancel button.
-        OurButton ok = new OurButton("Ok");
-        OurButton cancel = new OurButton("Cancel");
+            dialog.setWidth(POPUP_WIDTH);
+            dialog.setHeight(POPUP_HEIGHT);
+            dialog.setMinWidth(POPUP_WIDTH);
+            dialog.setMinHeight(POPUP_HEIGHT);
+            dialog.setResizable(false);
 
-        // Set up and add cancel actions.
-        ArrayList<ButtonAction> cancel_actions = new ArrayList<ButtonAction>();
-        cancel_actions.add(new ButtonOutput("New user operation canceled.", output));
-        cancel_actions.add(new ButtonClose(dialog));
-        actions_button_set(cancel, cancel_actions);
+            GridPane grid = get_grid();
 
-        // Set up and add ok actions.
-        ArrayList<ButtonAction> ok_actions = new ArrayList<ButtonAction>();
-        ok_actions.add(new ButtonOutput("New user created.", output));
-        ok_actions.add(new ButtonClose(dialog));
-        actions_button_set(ok, ok_actions);
+            // Create ok and cancel button.
+            OurButton ok = new OurButton("Ok");
+            OurButton cancel = new OurButton("Cancel");
 
-        grid.add(cancel, 0, 6);
-        grid.add(ok, 1, 6);
+            // Set up and add cancel actions.
+            ArrayList<ButtonAction> cancel_actions = new ArrayList<ButtonAction>();
+            cancel_actions.add(new ButtonOutput(status_cancel(), output));
+            cancel_actions.add(new ButtonClose(dialog));
+            actions_button_set(cancel, cancel_actions);
 
-        Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
-        Label label_name = new Label("Name");
-        OurTextField field_name = new OurTextField(ok);
-        grid.add(label_name, 0, 0);
-        grid.add(field_name, 1, 0);
+            // Set up and add ok actions.
+            ArrayList<ButtonAction> ok_actions = new ArrayList<ButtonAction>();
+            ok_actions.add(new ButtonOutput(status_ok(), output));
+            ok_actions.add(new ButtonClose(dialog));
+            actions_button_set(ok, ok_actions);
 
-        Label label_ssn = new Label("SSN");
-        OurTextField field_ssn = new OurTextField(ok);
-        grid.add(label_ssn, 0, 1);
-        grid.add(field_ssn, 1, 1);
+            grid.add(cancel, 0, 6);
+            grid.add(ok, 1, 6);
 
-        Label label_address = new Label("Address");
-        OurTextField field_address = new OurTextField(ok);
-        grid.add(label_address, 0, 2);
-        grid.add(field_address, 1, 2);
+            Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
+            Label label_name = new Label("Name");
+            OurTextField field_name = new OurTextField(ok);
+            grid.add(label_name, 0, 0);
+            grid.add(field_name, 1, 0);
 
-        Label label_phone = new Label("Phone");
-        OurTextField field_phone = new OurTextField(ok);
-        grid.add(label_phone, 0, 3);
-        grid.add(field_phone, 1, 3);
+            Label label_ssn = new Label("SSN");
+            OurTextField field_ssn = new OurTextField(ok);
+            grid.add(label_ssn, 0, 1);
+            grid.add(field_ssn, 1, 1);
 
-        Label label_email = new Label("Email");
-        OurTextField field_email = new OurTextField(ok);
-        grid.add(label_email, 0, 4);
-        grid.add(field_email, 1, 4);
+            Label label_address = new Label("Address");
+            OurTextField field_address = new OurTextField(ok);
+            grid.add(label_address, 0, 2);
+            grid.add(field_address, 1, 2);
 
-        dialog.setScene(scene);
+            Label label_phone = new Label("Phone");
+            OurTextField field_phone = new OurTextField(ok);
+            grid.add(label_phone, 0, 3);
+            grid.add(field_phone, 1, 3);
 
-        scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
+            Label label_email = new Label("Email");
+            OurTextField field_email = new OurTextField(ok);
+            grid.add(label_email, 0, 4);
+            grid.add(field_email, 1, 4);
 
-        dialog.show();
+            dialog.setScene(scene);
+            scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
+
+        }
+
+        public abstract void show();
+
+        public abstract String status_ok();
+
+        public abstract String status_cancel();
+    }
+
+    private class PopupNewUser extends PopupBase {
+        public PopupNewUser(Text output) {
+            super("New User", output);
+        }
+        public void show() {
+            this.dialog.show();
+        }
+        public String status_ok() {
+            return "User created successfully.";
+        }
+        public String status_cancel() {
+            return "User creation aborted.";
+        }
+    }
+
+    public void popup_handler(ActionEvent e, PopupBase popup) {
+        popup.show();
     }
 
     public void set_style(Scene scene)
@@ -384,7 +411,8 @@ public class Main extends Application {
         // Set buttons.
         OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
-        button_new_user.setOnAction(e-> popup_handler(e, status_bar));
+        PopupBase new_user = new PopupNewUser(status_bar);
+        button_new_user.setOnAction(e-> popup_handler(e, new_user));
 
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
