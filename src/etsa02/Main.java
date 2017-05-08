@@ -26,6 +26,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.LinkedList;
 
 public class Main extends Application {
 
@@ -243,6 +245,38 @@ public class Main extends Application {
         return login_scene;
     }
 
+    private class Bike {
+
+      private String barcode;
+      private String make;
+      private String color;
+      private String type;
+
+      public Bike(String barcode) {
+        this.barcode = barcode;
+      }
+
+      public void set_make(String make) {
+        this.make = make;
+      }
+
+      public void set_color(String color) {
+        this.color = color;
+      }
+
+      public void set_type(String type) {
+        this.type = type;
+      }
+
+      public String barcode() {
+        return this.barcode;
+      }
+
+      public boolean equals(Bike other) {
+        return other.barcode().equals(this.barcode);
+      }
+    }
+
     private class BikeOwner {
 
       private String name = "";
@@ -250,6 +284,7 @@ public class Main extends Application {
       private String address;
       private String phone;
       private String email;
+      private List<Bike> bikes;
 
       public BikeOwner(String name,
                       String ssn,
@@ -261,10 +296,19 @@ public class Main extends Application {
         this.address = address;
         this.phone = phone;
         this.email = email;
+        bikes = new LinkedList<Bike>();
       }
 
       public String toString() {
         return this.name;
+      }
+
+      public boolean addBike(Bike bike) {
+        return bikes.add(bike);
+      }
+
+      public boolean removeBike(Bike bike) {
+        return bikes.remove(bike);
       }
     }
 
@@ -276,13 +320,16 @@ public class Main extends Application {
 
         Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
 
+        BikeOwner Agda = new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
+        BikeOwner Bosse = new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
+        BikeOwner Cissi = new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
+
         // Set list of users.
         ObservableList<BikeOwner> data = FXCollections.observableArrayList(
-            new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se"),
-            new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234567", "Bosse@email.se"),
-            new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701234567", "Cicci@email.se")
+            Agda,
+            Bosse,
+            Cissi
         );
-
         ListView<BikeOwner> list = new ListView<BikeOwner>();
         list.setItems(data);
         list_grid.add(list, 0, 0);
