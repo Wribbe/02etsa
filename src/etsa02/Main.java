@@ -29,6 +29,9 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import hardware_testdrivers.BarcodePrinterTestDriver;
+
 import java.util.LinkedList;
 
 public class Main extends Application {
