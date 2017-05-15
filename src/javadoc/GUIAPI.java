@@ -37,9 +37,10 @@ public interface GUIAPI {
     /**
      * Add barcode to existing BikeOwner.
      * @param owner BikeOwner to be edited.
+     * @param barcode Barcode to be added.
      * @return boolean signaling successful addition.
      * */
-    public boolean addBarcode(BikeOwner owner);
+    public boolean addBarcode(BikeOwner owner, Barcode barcode);
 
     /**
      * Remove barcode from existing BikeOwner.

@@ -30,5 +30,17 @@ public interface HWAPI {
      * @param duration the amount of seconds the lock should be opened.
      * */
     public void open(ElectronicLock lock, int duration);
-}
 
+    /**
+     * Light LED on keypad with given color for given duration.
+     * @param color int representing LED color.
+     * @param time amount of seconds the LED should be lit for.
+     * */
+    public void lightLED(int color, int time);
+
+    /**
+     * Prints barcode.
+     * @param barcode to be printed, supplied as String.
+     * */
+    public void printBarcode(String barcode) throws IllegalArgumentException;
+}

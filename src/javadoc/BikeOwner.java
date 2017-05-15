@@ -2,6 +2,7 @@ package javadoc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * This class represents the data composing a BikeOwner inside of the Easy Parks
@@ -16,16 +17,17 @@ public class BikeOwner implements ListElement{
     private int num_args = 5;
     private String[] fields = new String[num_args];
 
+    private List<Barcode> barcodes;
+
     /**
      * Create a new BikeOwner instance.
      *
      * @param args 5 consecutive strings; name, ssn, address, phone and email.
      */
-    public BikeOwner(String... args) {
+    public BikeOwner(String[] args) {
 
         int i = 0;
         int argc = args.length;
-        List<String> strings = Arrays.asList(args);
         for (; i<argc; i++) {
             this.fields[i] = args[i];
         }
@@ -33,6 +35,8 @@ public class BikeOwner implements ListElement{
         for (; i<num_args; i++) {
             this.fields[i] = "";
         }
+
+        barcodes = new ArrayList<Barcode>();
     }
     /**
      * @return users name.
@@ -60,5 +64,19 @@ public class BikeOwner implements ListElement{
      */
     public String toString() {
         return name();
+    }
+
+    /**
+     * @param barcode Barcode to be added.
+     */
+    public void add_barcode(Barcode barcode) {
+        barcodes.add(barcode);
+    }
+
+    /**
+     * @param barcode Barcode to be removed.
+     */
+    public boolean remove_barcode(Barcode barcode) {
+        return barcodes.remove(barcode);
     }
 }

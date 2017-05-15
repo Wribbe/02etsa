@@ -24,4 +24,8 @@ public class Barcode implements ListElement {
     public String toString() {
         return serial;
     }
+
+    public boolean equals(Barcode barcode) {
+        return this.serial.equals(barcode.toString());
+    }
 }
