@@ -479,6 +479,9 @@ public class Main extends Application {
 
     public void start(Stage primaryStage)
     {
+    	BarcodePrinterTestDriver printer = new BarcodePrinterTestDriver("mupp", 10, 10);
+    	
+    	printer.printBarcode("12345");
         stage_main = primaryStage;
         stage_main.setWidth(LOGIN_WIDTH);
         stage_main.setHeight(LOGIN_HEIGHT);
