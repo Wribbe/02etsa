@@ -2,6 +2,8 @@ package javadoc;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Class that holds the core functionality of the Easy Park software stack.
@@ -16,6 +18,7 @@ public class Core implements GUIAPI {
      * Create a new Core instance.
      */
 
+
     private Map<String,BikeOwner> db;
 
     private final int size_input_vars = 5;
@@ -24,7 +27,7 @@ public class Core implements GUIAPI {
         db = new HashMap<String, BikeOwner>();
     }
 
-    public boolean newBikeOwner(String[] values){
+    public boolean newBikeOwner(String... values){
         if (values.length < size_input_vars) {
             System.err.println("To few arguments for creating a bike owner.");
             return false;
@@ -37,6 +40,7 @@ public class Core implements GUIAPI {
     public boolean editBikeOwner(BikeOwner owner) {
         BikeOwner stored = db.get(owner.ssn());
         if (stored == null) {
+            System.err.println("No owner found.");
             return false;
         }
         db.put(owner.ssn(), owner);
@@ -46,6 +50,7 @@ public class Core implements GUIAPI {
     public boolean removeBikeOwner(BikeOwner owner){
         BikeOwner stored = db.get(owner.ssn());
         if (stored == null) {
+            System.err.println("No owner found.");
             return false;
         }
         db.remove(owner.ssn());
@@ -55,6 +60,7 @@ public class Core implements GUIAPI {
     public boolean addBarcode(BikeOwner owner, Barcode barcode){
         BikeOwner stored = db.get(owner.ssn());
         if (stored == null) {
+            System.err.println("No owner found.");
             return false;
         }
         stored.add_barcode(barcode);
@@ -64,8 +70,24 @@ public class Core implements GUIAPI {
     public boolean removeBarcode(BikeOwner owner, Barcode barcode) {
         BikeOwner stored = db.get(owner.ssn());
         if (stored == null) {
+            System.err.println("No owner found.");
             return false;
         }
-        return owner.remove_barcode(barcode);
+        return stored.remove_barcode(barcode);
+    }
+
+    public List<String> list_users() {
+        List<String> users = new ArrayList<String>();
+        for (String ssn : db.keySet()) {
+            BikeOwner owner = db.get(ssn);
+            StringBuilder strb = new StringBuilder();
+            for (String field : owner.fields()) {
+                strb.append(field);
+                strb.append(GUIAPI.delimiter);
+            }
+            strb.append(owner.barcodes());
+            users.add(strb.toString());
+        }
+        return users;
     }
 }

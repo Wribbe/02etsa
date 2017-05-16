@@ -1,5 +1,7 @@
 package javadoc;
 
+import java.util.List;
+
 /**
  * @author AUTHOR-TAG
  * @version 0.9
@@ -11,6 +13,8 @@ package javadoc;
  * that makes use of the Core class.
  * */
 public interface GUIAPI {
+
+    public static final String delimiter = ";;";
 
     /**
      * Add new BikeOwner to system.
@@ -49,5 +53,12 @@ public interface GUIAPI {
      * @return boolean signaling successful removal.
      * */
     public boolean removeBarcode(BikeOwner owner, Barcode code);
+
+    /**
+     * List all users currently in the database.
+     * @return List of string containing name and ssn for users in
+     * storage.
+     * */
+    public List<String> list_users();
 }
 

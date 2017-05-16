@@ -16,16 +16,21 @@ public class Barcode implements ListElement {
     private int num_digits = 5;
     private String serial;
 
+    public static final String delimiter = "::";
+
     /**
      * Create a new Barcode instance.
      */
-    public Barcode() {
+    public Barcode(String serial) {
+        this.serial = serial;
     }
     public String toString() {
         return serial;
     }
 
-    public boolean equals(Barcode barcode) {
+    @Override
+    public boolean equals(Object o) {
+        Barcode barcode = (Barcode) o;
         return this.serial.equals(barcode.toString());
     }
 }

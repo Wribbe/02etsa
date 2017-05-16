@@ -24,11 +24,11 @@ public class BikeOwner implements ListElement{
      *
      * @param args 5 consecutive strings; name, ssn, address, phone and email.
      */
-    public BikeOwner(String[] args) {
+    public BikeOwner(String... args) {
 
         int i = 0;
         int argc = args.length;
-        for (; i<argc; i++) {
+        for (; i<argc && i<num_args; i++) {
             this.fields[i] = args[i];
         }
         // Not enough parameters, default to empty string.
@@ -37,6 +37,12 @@ public class BikeOwner implements ListElement{
         }
 
         barcodes = new ArrayList<Barcode>();
+        if (argc == 6) { // Barcodes supplied.
+            String[] tokens = args[5].split(Barcode.delimiter);
+            for (String code : Arrays.asList(tokens)) {
+                barcodes.add(new Barcode(code));
+            }
+        }
     }
     /**
      * @return users name.
@@ -75,8 +81,33 @@ public class BikeOwner implements ListElement{
 
     /**
      * @param barcode Barcode to be removed.
+     * @return boolean signaling if barcode was removed.
      */
     public boolean remove_barcode(Barcode barcode) {
         return barcodes.remove(barcode);
+    }
+
+    /**
+     * @return String array containing all the fields of the BikeOwner.
+     */
+    protected String[] fields() {
+        return fields;
+    }
+
+    /**
+     * @return String with all the barcodes concatenated.
+     */
+    protected String barcodes() {
+        StringBuilder strb = new StringBuilder();
+        for (Barcode barcode : barcodes) {
+            strb.append(barcode.toString());
+            strb.append(Barcode.delimiter);
+        }
+        if (!barcodes.isEmpty()) {
+            // Trim trailing occurrence of delimiter.
+            return strb.substring(0, strb.lastIndexOf(Barcode.delimiter));
+        } else {
+            return strb.toString();
+        }
     }
 }
