@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Class that holds the core functionality of the Easy Park software stack.
@@ -17,7 +18,6 @@ public class Core implements GUIAPI {
     /**
      * Create a new Core instance.
      */
-
 
     private Map<String,BikeOwner> db;
 
@@ -76,7 +76,13 @@ public class Core implements GUIAPI {
         return stored.remove_barcode(barcode);
     }
 
-    public List<String> list_users() {
+    public List<BikeOwner> listUsers() {
+        List list = new ArrayList<BikeOwner>(db.values());
+        Collections.sort(list);
+        return list;
+    }
+
+    protected List<String> list_users_encoded() {
         List<String> users = new ArrayList<String>();
         for (String ssn : db.keySet()) {
             BikeOwner owner = db.get(ssn);

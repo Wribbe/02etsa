@@ -56,9 +56,8 @@ public interface GUIAPI {
 
     /**
      * List all users currently in the database.
-     * @return List of string containing name and ssn for users in
-     * storage.
+     * @return list containing all BikeOwner object in database.
      * */
-    public List<String> list_users();
+    public List<BikeOwner> listUsers();
 }
 
