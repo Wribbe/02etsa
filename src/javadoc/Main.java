@@ -161,8 +161,8 @@ public class Main extends Application {
     }
 
     private class PopupNewUser extends PopupBase {
-        public PopupNewUser(Text output) {
-            super("New User", output);
+        public PopupNewUser(Text output, String... input_fields) {
+            super("New User", output, input_fields);
         }
         public void show() {
             this.dialog.show();
@@ -189,6 +189,57 @@ public class Main extends Application {
                     if (validate()) {
                         output.setText(status_ok());
                         api.newBikeOwner(fieldsAsArray());
+                        update_view();
+                        dialog.close();
+                    }
+                }
+            };
+            return handler;
+        }
+        public EventHandler<ActionEvent> action_cancel() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    output.setText(status_cancel());
+                    dialog.close();
+                }
+            };
+            return handler;
+        }
+    }
+
+    private class PopupNewBarcode extends PopupBase {
+
+        private BikeOwner owner;
+
+        public PopupNewBarcode(Text output, BikeOwner owner, String... input_fields) {
+            super("New Barcode", output, input_fields);
+            this.owner = owner;
+        }
+        public void show() {
+            this.dialog.show();
+        }
+        public String status_ok() {
+            return "Barcode created successfully.";
+        }
+        public String status_cancel() {
+            return "Barcode creation aborted.";
+        }
+
+        private boolean validate() {
+            for (OurTextField field : fields) {
+                if (field.getText().trim().equals("")) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        public EventHandler<ActionEvent> action_ok() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    if (validate()) {
+                        output.setText(status_ok());
+                        api.addBarcode(owner, new Barcode(fieldsAsArray()[0]));
                         update_view();
                         dialog.close();
                     }
@@ -370,8 +421,8 @@ public class Main extends Application {
                     status_bar.setText("Error: Please select a user.");
                     return;
                 }
-                System.out.println("ADD BARCODE");
-                // Add barcode to user.
+                BikeOwner owner = (BikeOwner) global_selected_owner.getValue();
+                popup_handler(e, new PopupNewBarcode(status_bar, owner, "Barcode"));
             }
         });
 
@@ -387,7 +438,7 @@ public class Main extends Application {
                 BikeOwner owner = (BikeOwner) global_selected_barcode.getParent().getValue();
                 api.removeBarcode(owner, to_be_removed);
                 update_view();
-                status_bar.setText("Successfully removed: "+to_be_removed.toString()+" from: +"+owner.name()+".");
+                status_bar.setText("Successfully removed: "+to_be_removed.toString()+" from: "+owner.name()+".");
             }
         });
 
