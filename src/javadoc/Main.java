@@ -184,7 +184,7 @@ public class Main extends Application {
 
         private boolean validate() {
             for (OurTextField field : fields) {
-                if (field.getText().equals("")) {
+                if (field.getText().trim().equals("")) {
                     return false;
                 }
             }
