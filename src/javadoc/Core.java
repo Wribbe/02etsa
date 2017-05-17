@@ -67,13 +67,20 @@ public class Core implements GUIAPI {
         return true;
     }
 
-    public boolean editBikeOwner(BikeOwner owner) {
-        BikeOwner stored = db.get(owner.ssn());
+    public boolean editBikeOwner(BikeOwner old_owner, BikeOwner new_owner) {
+        BikeOwner stored = db.get(old_owner.ssn());
         if (stored == null) {
-            System.err.println("No owner found.");
+            System.err.println("No owner found in editBikeOwner.");
             return false;
         }
-        stored.update(owner);
+        // Changed the SSN remove old from database and re-add.
+        if (!stored.ssn().equals(new_owner.ssn())) {
+            db.remove(stored);
+            stored.update(new_owner);
+            db.put(stored.ssn(), stored);
+        } else {
+            stored.update(new_owner);
+        }
         return true;
     }
 

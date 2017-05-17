@@ -26,10 +26,11 @@ public interface GUIAPI {
 
     /**
      * Edit existing BikeOwner.
-     * @param owner BikeOwner to be edited.
+     * @param old_owner BikeOwner to be edited.
+     * @param new_owner BikeOwner used to update old.
      * @return boolean signaling successful edit.
      * */
-    public boolean editBikeOwner(BikeOwner owner);
+    public boolean editBikeOwner(BikeOwner old_owner, BikeOwner new_owner);
 
     /**
      * Remove existing BikeOwner.

@@ -161,31 +161,7 @@ public class Main extends Application {
             return list.toArray(new String[list.size()]);
         }
 
-        public abstract void show();
-
-        public abstract String status_ok();
-
-        public abstract String status_cancel();
-
-        public abstract EventHandler<ActionEvent> action_ok();
-        public abstract EventHandler<ActionEvent> action_cancel();
-    }
-
-    private class PopupNewUser extends PopupBase {
-        public PopupNewUser(Text output, String... input_fields) {
-            super("New User", output, input_fields);
-        }
-        public void show() {
-            this.dialog.show();
-        }
-        public String status_ok() {
-            return "User created successfully.";
-        }
-        public String status_cancel() {
-            return "User creation aborted.";
-        }
-
-        private String validate() {
+        protected String validate() {
             int current_index = 0;
             for (OurTextField field : fields) {
 
@@ -214,6 +190,31 @@ public class Main extends Application {
                 current_index++;
             }
             return "";
+        }
+
+
+        public abstract void show();
+
+        public abstract String status_ok();
+
+        public abstract String status_cancel();
+
+        public abstract EventHandler<ActionEvent> action_ok();
+        public abstract EventHandler<ActionEvent> action_cancel();
+    }
+
+    private class PopupNewUser extends PopupBase {
+        public PopupNewUser(Text output, String... input_fields) {
+            super("New User", output, input_fields);
+        }
+        public void show() {
+            this.dialog.show();
+        }
+        public String status_ok() {
+            return "User created successfully.";
+        }
+        public String status_cancel() {
+            return "User creation aborted.";
         }
 
         public EventHandler<ActionEvent> action_ok() {
@@ -256,9 +257,6 @@ public class Main extends Application {
             for (int i=0; i<fields.size(); i++) {
                 this.fields.get(i).setText(fields_owner[i]);
             }
-            int ssn_index = Arrays.asList(popup_fields).indexOf("SSN");
-            this.fields.get(ssn_index).setDisable(true);
-
         }
         public void show() {
             this.dialog.show();
@@ -270,26 +268,21 @@ public class Main extends Application {
             return "User edit aborted.";
         }
 
-        private boolean validate() {
-            for (OurTextField field : fields) {
-                if (field.getText().trim().equals("")) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
         public EventHandler<ActionEvent> action_ok() {
             EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
                 public void handle(ActionEvent e) {
-                    if (validate()) {
+                    if (validate().equals("")) {
                         output.setText(status_ok());
                         BikeOwner bike_owner = (BikeOwner) owner.getValue();
                         BikeOwner updated = new BikeOwner(fieldsAsArray());
+                        // Update database before updating GUI object.
+                        api.editBikeOwner(bike_owner, updated);
+                        // Update GUI object.
                         bike_owner.update(updated);
-                        api.editBikeOwner(updated);
                         users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
                         dialog.close();
+                    } else {
+                        output.setText(validate());
                     }
                 }
             };
