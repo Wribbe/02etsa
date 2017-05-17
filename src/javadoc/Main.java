@@ -98,6 +98,8 @@ public class Main extends Application {
         protected GridPane grid;
         protected Text output;
 
+        private List<OurTextField> fields = new ArrayList<OurTextField>();
+
         public PopupBase(String title, Text output) {
 
             this.output = output;
@@ -125,30 +127,31 @@ public class Main extends Application {
             grid.add(ok, 1, 6);
 
             Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
+
             Label label_name = new Label("Name");
-            OurTextField field_name = new OurTextField(ok);
             grid.add(label_name, 0, 0);
-            grid.add(field_name, 1, 0);
+            fields.add(new OurTextField(ok));
+            grid.add(fields.get(fields.size()-1), 1, 0);
 
             Label label_ssn = new Label("SSN");
-            OurTextField field_ssn = new OurTextField(ok);
             grid.add(label_ssn, 0, 1);
-            grid.add(field_ssn, 1, 1);
+            fields.add(new OurTextField(ok));
+            grid.add(fields.get(fields.size()-1), 1, 1);
 
             Label label_address = new Label("Address");
-            OurTextField field_address = new OurTextField(ok);
             grid.add(label_address, 0, 2);
-            grid.add(field_address, 1, 2);
+            fields.add(new OurTextField(ok));
+            grid.add(fields.get(fields.size()-1), 1, 2);
 
             Label label_phone = new Label("Phone");
-            OurTextField field_phone = new OurTextField(ok);
             grid.add(label_phone, 0, 3);
-            grid.add(field_phone, 1, 3);
+            fields.add(new OurTextField(ok));
+            grid.add(fields.get(fields.size()-1), 1, 3);
 
             Label label_email = new Label("Email");
-            OurTextField field_email = new OurTextField(ok);
             grid.add(label_email, 0, 4);
-            grid.add(field_email, 1, 4);
+            fields.add(new OurTextField(ok));
+            grid.add(fields.get(fields.size()-1), 1, 4);
 
             dialog.setScene(scene);
             scene.getStylesheets().add(Main.class.getResource("../etsa02/login.css").toExternalForm());
