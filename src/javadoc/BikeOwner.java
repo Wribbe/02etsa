@@ -69,7 +69,7 @@ public class BikeOwner implements ListElement, Comparable {
      * @return users as String.
      */
     public String toString() {
-        return name();
+        return ssn()+" : "+name()+" : "+"PIN";
     }
 
     /**

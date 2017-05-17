@@ -71,9 +71,9 @@ public class Main extends Application {
     {
         api = new Core();
 
-        api.newBikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
-        api.newBikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
-        api.newBikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
+        api.newBikeOwner("Agda", "198901013829", "Hem Agda", "0701234567", "Agda@email.se");
+        api.newBikeOwner("Bosse", "199711013382", "Hem Bosse", "0701234724", "Bosse@email.se");
+        api.newBikeOwner("Cicci", "200302139382", "Hem Cicci", "0701235043", "Cicci@email.se");
 
         launch(args);
     }
