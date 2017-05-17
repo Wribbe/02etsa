@@ -4,7 +4,7 @@ directory="$1"
 echo ${directory}
 
 cd ${directory}
-javac *.java
+javac -cp ../.:../../* *.java
 compilation_result=$?
 if [ "$compilation_result" != 0 ]; then
     echo "Compilation error.. aborting."
@@ -12,6 +12,6 @@ if [ "$compilation_result" != 0 ]; then
 fi
 cd ..
 
-command="java ${directory}.Main"
+command="java -cp .:../* ${directory}.Main"
 echo "Running command: ${command}"
 ${command}
