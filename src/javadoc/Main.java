@@ -54,6 +54,9 @@ public class Main extends Application {
     int MAIN_HEIGHT = 200;
     int MAIN_WIDTH = 200;
 
+    TreeItem<ListElement> users;
+    TreeView<ListElement> view_root;
+
 
     public static void main(String args[])
     {
@@ -158,6 +161,14 @@ public class Main extends Application {
 
         }
 
+        public String[] fieldsAsArray() {
+            List<String> list = new ArrayList<String>();
+            for (OurTextField field : fields) {
+                list.add(field.getText().trim());
+            }
+            return list.toArray(new String[list.size()]);
+        }
+
         public abstract void show();
 
         public abstract String status_ok();
@@ -196,6 +207,8 @@ public class Main extends Application {
                 public void handle(ActionEvent e) {
                     if (validate()) {
                         output.setText(status_ok());
+                        api.newBikeOwner(fieldsAsArray());
+                        update_view();
                         dialog.close();
                     }
                 }
@@ -285,6 +298,18 @@ public class Main extends Application {
         return login_scene;
     }
 
+    public void update_view() {
+        users = new TreeItem<ListElement>();
+        for (BikeOwner owner : api.listUsers()) {
+            TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
+            for (Barcode barcode : owner.getBarcodes()) {
+                item.getChildren().add(new TreeItem<ListElement>(barcode, null));
+            }
+            users.getChildren().add(item);
+        }
+        view_root.setRoot(users);
+    }
+
     public Scene setup_main_scene(Stage stage_main) {
 
         GridPane main_grid = get_grid();
@@ -297,20 +322,11 @@ public class Main extends Application {
 
         // Set up main rootItem.
         //users = new TreeItem<ListElement>(Agda, null);
-        TreeItem<ListElement> users = new TreeItem<ListElement>();
-        TreeView<ListElement> view_root = new TreeView<ListElement>();
-
-        view_root.setRoot(users);
+        view_root = new TreeView<ListElement>();
         view_root.setShowRoot(false);
-
-        for (BikeOwner owner : api.listUsers()) {
-            TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
-            for (Barcode barcode : owner.getBarcodes()) {
-                item.getChildren().add(new TreeItem<ListElement>(barcode, null));
-            }
-            users.getChildren().add(item);
-        }
         list_grid.add(view_root, 0, 0);
+
+        update_view();
 //        for (int i=0; i<100; i++) {
 //          TreeItem<ListElement> item = new TreeItem<ListElement>(Agda, null);
 //          for (int j=0; j<20; j++) {
