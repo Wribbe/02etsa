@@ -98,7 +98,7 @@ public class Main extends Application {
         protected GridPane grid;
         protected Text output;
 
-        private List<OurTextField> fields = new ArrayList<OurTextField>();
+        protected List<OurTextField> fields = new ArrayList<OurTextField>();
 
         public PopupBase(String title, Text output) {
 
@@ -183,7 +183,12 @@ public class Main extends Application {
         }
 
         private boolean validate() {
-            return false;
+            for (OurTextField field : fields) {
+                if (field.getText().equals("")) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public EventHandler<ActionEvent> action_ok() {
