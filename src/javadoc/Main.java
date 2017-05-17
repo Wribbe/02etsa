@@ -299,7 +299,9 @@ public class Main extends Application {
     }
 
     public void update_view() {
+
         users = new TreeItem<ListElement>();
+
         for (BikeOwner owner : api.listUsers()) {
             TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
             for (Barcode barcode : owner.getBarcodes()) {
@@ -308,6 +310,7 @@ public class Main extends Application {
             users.getChildren().add(item);
         }
         view_root.setRoot(users);
+
     }
 
     public Scene setup_main_scene(Stage stage_main) {
@@ -320,30 +323,35 @@ public class Main extends Application {
 
         view_root = new TreeView<ListElement>();
         view_root.setShowRoot(false);
-        list_grid.add(view_root, 0, 0);
 
-        update_view();
-
-        // Set listener.
-        view_root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ListElement>>() {
+        ChangeListener users_listener = new ChangeListener<TreeItem<ListElement>>() {
             public void changed(ObservableValue<? extends TreeItem<ListElement>> observable,
                                 TreeItem<ListElement> value_old, TreeItem<ListElement> value_new) {
 
-                ListElement element = value_new.getValue();
+                if(value_new != null) {
+                    ListElement element = value_new.getValue();
 
-                if (element instanceof BikeOwner) {
-                    global_selected_owner = value_new;
-                    global_selected_barcode = null;
-                } else if (element instanceof Barcode) {
-                    global_selected_owner = null;
-                    global_selected_barcode = value_new;
-                } else {
-                    global_selected_owner = null;
-                    global_selected_barcode = null;
-                    System.out.println("Don't know what you clicked.");
+                    if (element instanceof BikeOwner) {
+                        global_selected_owner = value_new;
+                        global_selected_barcode = null;
+                    } else if (element instanceof Barcode) {
+                        global_selected_owner = null;
+                        global_selected_barcode = value_new;
+                    } else {
+                        global_selected_owner = null;
+                        global_selected_barcode = null;
+                        System.out.println("Don't know what you clicked.");
+                    }
                 }
             }
-        });
+        };
+
+        view_root.getSelectionModel().selectedItemProperty().addListener(users_listener);
+
+
+        update_view();
+
+        list_grid.add(view_root, 0, 0);
 
         // Create statusbar and label.
         Label status_label = new Label("Status:");
@@ -367,10 +375,10 @@ public class Main extends Application {
                     return;
                 }
                 // Remove the tree item.
-                String removed_name = global_selected_owner.getValue().toString();
-                global_selected_owner.getParent().getChildren().remove(global_selected_owner);
-                global_selected_owner = null;
-                status_bar.setText("Successfully removed: "+removed_name+".");
+                BikeOwner to_be_removed = (BikeOwner) global_selected_owner.getValue();
+                api.removeBikeOwner(to_be_removed);
+                update_view();
+                status_bar.setText("Successfully removed: "+to_be_removed.name()+".");
             }
         });
 
