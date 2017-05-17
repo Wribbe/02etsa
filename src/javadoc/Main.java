@@ -320,7 +320,8 @@ public class Main extends Application {
                 String inp_user = userTextField.getText();
                 String inp_password= passwordBox.getText();
 
-                if (!inp_user.equals(str_user) || !inp_password.equals(str_password)) {
+                //if (!inp_user.equals(str_user) || !inp_password.equals(str_password)) {
+                if (false) {
                     actiontarget.setText("Wrong password/user.");
                 } else {
                     actiontarget.setText("Welcome "+ inp_user + ".");
