@@ -73,7 +73,7 @@ public class Core implements GUIAPI {
             System.err.println("No owner found.");
             return false;
         }
-        db.put(owner.ssn(), owner);
+        stored.update(owner);
         return true;
     }
 

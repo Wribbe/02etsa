@@ -30,6 +30,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
@@ -48,6 +49,8 @@ public class Main extends Application {
     BarcodePrinterTestDriver printer;
 
     private static GUIAPI api;
+
+    private String[] popup_fields = {"Name", "SSN", "Address", "Phone", "Email"};
 
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
@@ -214,22 +217,29 @@ public class Main extends Application {
         }
     }
 
-    private class PopupNewBarcode extends PopupBase {
+    private class PopupEditUser extends PopupBase {
 
-        private TreeItem<ListElement> owner;
+        TreeItem<ListElement> owner;
 
-        public PopupNewBarcode(Text output, TreeItem<ListElement> owner, String... input_fields) {
-            super("New Barcode", output, input_fields);
+        public PopupEditUser(Text output, TreeItem<ListElement> owner) {
+            super("Edit User", output, popup_fields);
             this.owner = owner;
+            String[] fields_owner = ((BikeOwner) owner.getValue()).getFields();
+            for (int i=0; i<fields.size(); i++) {
+                this.fields.get(i).setText(fields_owner[i]);
+            }
+            int ssn_index = Arrays.asList(popup_fields).indexOf("SSN");
+            this.fields.get(ssn_index).setDisable(true);
+
         }
         public void show() {
             this.dialog.show();
         }
         public String status_ok() {
-            return "Barcode created successfully.";
+            return "User edited successfully.";
         }
         public String status_cancel() {
-            return "Barcode creation aborted.";
+            return "User edit aborted.";
         }
 
         private boolean validate() {
@@ -246,6 +256,12 @@ public class Main extends Application {
                 public void handle(ActionEvent e) {
                     if (validate()) {
                         output.setText(status_ok());
+                        BikeOwner bike_owner = (BikeOwner) owner.getValue();
+                        BikeOwner updated = new BikeOwner(fieldsAsArray());
+                        bike_owner.update(updated);
+                        api.editBikeOwner(updated);
+                        users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
+                        dialog.close();
                     }
                 }
             };
@@ -413,10 +429,19 @@ public class Main extends Application {
         // Set buttons.
         OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
-        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(status_bar, "Name", "SSN", "Address", "Phone", "Email")));
+        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(status_bar, popup_fields)));
 
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
+        button_edit_user.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                if (global_selected_owner == null) {
+                    status_bar.setText("Error: Please select a user.");
+                    return;
+                }
+                popup_handler(e, new PopupEditUser(status_bar, global_selected_owner));
+            }
+        });
 
         OurButton button_remove_user = new OurButton("Remove user");
         button_grid.add(button_remove_user, 1, 2);

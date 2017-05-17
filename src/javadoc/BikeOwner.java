@@ -127,4 +127,21 @@ public class BikeOwner implements ListElement, Comparable {
             return strb.toString();
         }
     }
+
+
+    /**
+     * @return copy of fields.
+     */
+    protected String[] getFields() {
+        String[] fields_return = new String[fields.length];
+        System.arraycopy(fields, 0, fields_return, 0, fields.length);
+        return fields_return;
+    }
+
+    /**
+     * @param other Update a BikeOwner with the fields of another BikeOwner.
+     */
+    protected void update(BikeOwner other) {
+        this.fields = other.getFields();
+    }
 }
