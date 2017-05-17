@@ -181,12 +181,18 @@ public class Main extends Application {
         public String status_cancel() {
             return "User creation aborted.";
         }
+
+        private boolean validate() {
+            return false;
+        }
+
         public EventHandler<ActionEvent> action_ok() {
             EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
                 public void handle(ActionEvent e) {
-                    output.setText(status_ok());
-//                    add_user(Bosse);
-                    dialog.close();
+                    if (validate()) {
+                        output.setText(status_ok());
+                        dialog.close();
+                    }
                 }
             };
             return handler;
