@@ -94,7 +94,7 @@ public class BikeOwner implements ListElement, Comparable {
      */
     public int compareTo(Object o) {
         BikeOwner other = (BikeOwner) o;
-        return name().compareTo(other.name());
+        return name().toLowerCase().compareTo(other.name().toLowerCase());
     }
 
     /**
