@@ -30,6 +30,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
@@ -48,6 +49,9 @@ public class Main extends Application {
     BarcodePrinterTestDriver printer;
 
     private static GUIAPI api;
+
+    private String[] popup_fields = {"Name", "SSN", "Address", "Phone", "Email"};
+    private String[] popup_formats = {".*", "[0-9]{12}", ".*", ".*", ".*"};
 
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
@@ -178,6 +182,72 @@ public class Main extends Application {
             return "User creation aborted.";
         }
 
+        private String validate() {
+            int current_index = 0;
+            for (OurTextField field : fields) {
+                if (field.getText().trim().equals("")) {
+                    return "Please put a value in field \""+popup_fields[current_index]+"\".";
+                }
+                if (
+                current_index++;
+            }
+            return "";
+        }
+
+        public EventHandler<ActionEvent> action_ok() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    if (validate().equals("")) {
+                        output.setText(status_ok());
+                        api.newBikeOwner(fieldsAsArray());
+                        TreeItem<ListElement> item;
+                        item = new TreeItem<ListElement>(new BikeOwner(fieldsAsArray()), null);
+                        users.getChildren().add(item);
+                        users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
+                        dialog.close();
+                    } else {
+                        output.setText(validate());
+                    }
+                }
+            };
+            return handler;
+        }
+        public EventHandler<ActionEvent> action_cancel() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    output.setText(status_cancel());
+                    dialog.close();
+                }
+            };
+            return handler;
+        }
+    }
+
+    private class PopupEditUser extends PopupBase {
+
+        TreeItem<ListElement> owner;
+
+        public PopupEditUser(Text output, TreeItem<ListElement> owner) {
+            super("Edit User", output, popup_fields);
+            this.owner = owner;
+            String[] fields_owner = ((BikeOwner) owner.getValue()).getFields();
+            for (int i=0; i<fields.size(); i++) {
+                this.fields.get(i).setText(fields_owner[i]);
+            }
+            int ssn_index = Arrays.asList(popup_fields).indexOf("SSN");
+            this.fields.get(ssn_index).setDisable(true);
+
+        }
+        public void show() {
+            this.dialog.show();
+        }
+        public String status_ok() {
+            return "User edited successfully.";
+        }
+        public String status_cancel() {
+            return "User edit aborted.";
+        }
+
         private boolean validate() {
             for (OurTextField field : fields) {
                 if (field.getText().trim().equals("")) {
@@ -192,10 +262,10 @@ public class Main extends Application {
                 public void handle(ActionEvent e) {
                     if (validate()) {
                         output.setText(status_ok());
-                        api.newBikeOwner(fieldsAsArray());
-                        TreeItem<ListElement> item;
-                        item = new TreeItem<ListElement>(new BikeOwner(fieldsAsArray()), null);
-                        users.getChildren().add(item);
+                        BikeOwner bike_owner = (BikeOwner) owner.getValue();
+                        BikeOwner updated = new BikeOwner(fieldsAsArray());
+                        bike_owner.update(updated);
+                        api.editBikeOwner(updated);
                         users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
                         dialog.close();
                     }
@@ -212,58 +282,6 @@ public class Main extends Application {
             };
             return handler;
         }
-    }
-
-    private class PopupNewBarcode extends PopupBase {
-
-        private TreeItem<ListElement> owner;
-
-        public PopupNewBarcode(Text output, TreeItem<ListElement> owner, String... input_fields) {
-            super("New Barcode", output, input_fields);
-            this.owner = owner;
-        }
-        public void show() {
-            this.dialog.show();
-        }
-        public String status_ok() {
-            return "Barcode created successfully.";
-        }
-        public String status_cancel() {
-            return "Barcode creation aborted.";
-        }
-
-        private boolean validate() {
-            for (OurTextField field : fields) {
-                if (field.getText().trim().equals("")) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        public EventHandler<ActionEvent> action_ok() {
-            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent e) {
-                    if (validate()) {
-                        output.setText(status_ok());
-                    }
-                }
-            };
-            return handler;
-        }
-        public EventHandler<ActionEvent> action_cancel() {
-            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
-                public void handle(ActionEvent e) {
-                    output.setText(status_cancel());
-                    dialog.close();
-                }
-            };
-            return handler;
-        }
-    }
-
-    public void add_user(BikeOwner user) {
-//        users.getChildren().add(new TreeItem<ListElement>(user));
     }
 
     public void popup_handler(ActionEvent e, PopupBase popup) {
@@ -325,7 +343,6 @@ public class Main extends Application {
                     actiontarget.setText("Welcome "+ inp_user + ".");
                     stage_main.setScene(main_scene);
                     stage_main.show();
-                    //printer = new BarcodePrinterTestDriver("mupp", 10, 10);
                 }
             }
         });
@@ -417,10 +434,19 @@ public class Main extends Application {
         // Set buttons.
         OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
-        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(status_bar, "Name", "SSN", "Address", "Phone", "Email")));
+        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(status_bar, popup_fields)));
 
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
+        button_edit_user.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                if (global_selected_owner == null) {
+                    status_bar.setText("Error: Please select a user.");
+                    return;
+                }
+                popup_handler(e, new PopupEditUser(status_bar, global_selected_owner));
+            }
+        });
 
         OurButton button_remove_user = new OurButton("Remove user");
         button_grid.add(button_remove_user, 1, 2);
@@ -493,7 +519,14 @@ public class Main extends Application {
         button_grid.add(button_print_barcode, 1, 5);
         button_print_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                System.out.println("PRINT BARCODE!");
+                if (global_selected_barcode == null) {
+                    status_bar.setText("Error: Please select a barcode.");
+                    return;
+                }
+                if (printer == null) {
+                    printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
+                }
+                printer.printBarcode(((Barcode)global_selected_barcode.getValue()).toString());
             }
         });
 
