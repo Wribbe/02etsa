@@ -103,7 +103,7 @@ public class Main extends Application {
 
         protected List<OurTextField> fields = new ArrayList<OurTextField>();
 
-        public PopupBase(String title, Text output) {
+        public PopupBase(String title, Text output, String... fields_input) {
 
             this.output = output;
 
@@ -126,35 +126,16 @@ public class Main extends Application {
             ok.setOnAction(action_ok());
             cancel.setOnAction(action_cancel());
 
-            grid.add(cancel, 0, 6);
-            grid.add(ok, 1, 6);
+            grid.add(cancel, 0, fields_input.length);
+            grid.add(ok, 1, fields_input.length);
 
             Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
 
-            Label label_name = new Label("Name");
-            grid.add(label_name, 0, 0);
-            fields.add(new OurTextField(ok));
-            grid.add(fields.get(fields.size()-1), 1, 0);
-
-            Label label_ssn = new Label("SSN");
-            grid.add(label_ssn, 0, 1);
-            fields.add(new OurTextField(ok));
-            grid.add(fields.get(fields.size()-1), 1, 1);
-
-            Label label_address = new Label("Address");
-            grid.add(label_address, 0, 2);
-            fields.add(new OurTextField(ok));
-            grid.add(fields.get(fields.size()-1), 1, 2);
-
-            Label label_phone = new Label("Phone");
-            grid.add(label_phone, 0, 3);
-            fields.add(new OurTextField(ok));
-            grid.add(fields.get(fields.size()-1), 1, 3);
-
-            Label label_email = new Label("Email");
-            grid.add(label_email, 0, 4);
-            fields.add(new OurTextField(ok));
-            grid.add(fields.get(fields.size()-1), 1, 4);
+            for (int i=0; i<fields_input.length; i++) {
+                grid.add(new Label(fields_input[i]), 0, i);
+                fields.add(new OurTextField(ok));
+                grid.add(fields.get(fields.size()-1), 1, i);
+            }
 
             dialog.setScene(scene);
             scene.getStylesheets().add(Main.class.getResource("../etsa02/login.css").toExternalForm());
@@ -360,7 +341,7 @@ public class Main extends Application {
         // Set buttons.
         OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
-        PopupBase new_user = new PopupNewUser(status_bar);
+        PopupBase new_user = new PopupNewUser(status_bar, "Name", "SSN", "Address", "Phone", "Email");
         button_new_user.setOnAction(e-> popup_handler(e, new_user));
 
         OurButton button_edit_user = new OurButton("Edit user");
