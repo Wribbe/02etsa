@@ -181,19 +181,21 @@ public class Main extends Application {
             return "User creation aborted.";
         }
 
-        private boolean validate() {
+        private String validate() {
+            int current_index = 0;
             for (OurTextField field : fields) {
                 if (field.getText().trim().equals("")) {
-                    return false;
+                    return "Please put a value in field \""+popup_fields[current_index]+"\".";
                 }
+                current_index++;
             }
-            return true;
+            return "";
         }
 
         public EventHandler<ActionEvent> action_ok() {
             EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
                 public void handle(ActionEvent e) {
-                    if (validate()) {
+                    if (validate().equals("")) {
                         output.setText(status_ok());
                         api.newBikeOwner(fieldsAsArray());
                         TreeItem<ListElement> item;
@@ -201,6 +203,8 @@ public class Main extends Application {
                         users.getChildren().add(item);
                         users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
                         dialog.close();
+                    } else {
+                        output.setText(validate());
                     }
                 }
             };
