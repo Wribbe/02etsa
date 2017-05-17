@@ -29,6 +29,7 @@ import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
 
 import hardware_testdrivers.BarcodePrinterTestDriver;
 
@@ -189,7 +190,10 @@ public class Main extends Application {
                     if (validate()) {
                         output.setText(status_ok());
                         api.newBikeOwner(fieldsAsArray());
-                        update_view();
+                        TreeItem<ListElement> item;
+                        item = new TreeItem<ListElement>(new BikeOwner(fieldsAsArray()), null);
+                        users.getChildren().add(item);
+                        users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
                         dialog.close();
                     }
                 }
@@ -240,7 +244,6 @@ public class Main extends Application {
                     if (validate()) {
                         output.setText(status_ok());
                         api.addBarcode(owner, new Barcode(fieldsAsArray()[0]));
-                        update_view();
                         dialog.close();
                     }
                 }
@@ -330,21 +333,6 @@ public class Main extends Application {
         return login_scene;
     }
 
-    public void update_view() {
-
-        users = new TreeItem<ListElement>();
-
-        for (BikeOwner owner : api.listUsers()) {
-            TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
-            for (Barcode barcode : owner.getBarcodes()) {
-                item.getChildren().add(new TreeItem<ListElement>(barcode, null));
-            }
-            users.getChildren().add(item);
-        }
-        view_root.setRoot(users);
-
-    }
-
     public Scene setup_main_scene(Stage stage_main) {
 
         GridPane main_grid = get_grid();
@@ -380,10 +368,19 @@ public class Main extends Application {
 
         view_root.getSelectionModel().selectedItemProperty().addListener(users_listener);
 
-
-        update_view();
-
         list_grid.add(view_root, 0, 0);
+
+        users = new TreeItem<ListElement>();
+
+        for (BikeOwner owner : api.listUsers()) {
+            TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
+            for (Barcode barcode : owner.getBarcodes()) {
+                item.getChildren().add(new TreeItem<ListElement>(barcode, null));
+            }
+            users.getChildren().add(item);
+        }
+
+        view_root.setRoot(users);
 
         // Create statusbar and label.
         Label status_label = new Label("Status:");
@@ -406,10 +403,13 @@ public class Main extends Application {
                     status_bar.setText("Error: Please select a user.");
                     return;
                 }
+                // Remove from database.
                 BikeOwner to_be_removed = (BikeOwner) global_selected_owner.getValue();
                 api.removeBikeOwner(to_be_removed);
-                update_view();
-                status_bar.setText("Successfully removed: "+to_be_removed.name()+".");
+
+                // Remove from gui.
+                global_selected_owner.getParent().getChildren().remove(global_selected_owner);
+                global_selected_owner = null;
             }
         });
 
@@ -434,10 +434,15 @@ public class Main extends Application {
                     status_bar.setText("Error: Please select a barcode.");
                     return;
                 }
+                // Remove from core.
                 Barcode to_be_removed = (Barcode) global_selected_barcode.getValue();
                 BikeOwner owner = (BikeOwner) global_selected_barcode.getParent().getValue();
                 api.removeBarcode(owner, to_be_removed);
-                update_view();
+
+                // Remove from gui.
+                global_selected_barcode.getParent().getChildren().remove(global_selected_barcode);
+                global_selected_barcode = null;
+
                 status_bar.setText("Successfully removed: "+to_be_removed.toString()+" from: "+owner.name()+".");
             }
         });
