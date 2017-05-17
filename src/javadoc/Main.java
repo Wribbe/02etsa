@@ -374,7 +374,6 @@ public class Main extends Application {
                     status_bar.setText("Error: Please select a user.");
                     return;
                 }
-                // Remove the tree item.
                 BikeOwner to_be_removed = (BikeOwner) global_selected_owner.getValue();
                 api.removeBikeOwner(to_be_removed);
                 update_view();
@@ -403,7 +402,11 @@ public class Main extends Application {
                     status_bar.setText("Error: Please select a barcode.");
                     return;
                 }
-                System.out.println("REMOVE barcode!");
+                Barcode to_be_removed = (Barcode) global_selected_barcode.getValue();
+                BikeOwner owner = (BikeOwner) global_selected_barcode.getParent().getValue();
+                api.removeBarcode(owner, to_be_removed);
+                update_view();
+                status_bar.setText("Successfully removed: "+to_be_removed.toString()+" from: +"+owner.name()+".");
             }
         });
 
