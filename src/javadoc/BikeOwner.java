@@ -29,7 +29,7 @@ public class BikeOwner implements ListElement, Comparable {
         int i = 0;
         int argc = args.length;
         for (; i<argc && i<num_args; i++) {
-            this.fields[i] = args[i];
+            this.fields[i] = args[i].trim();
         }
         // Not enough parameters, default to empty string.
         for (; i<num_args; i++) {
