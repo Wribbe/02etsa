@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -18,8 +19,10 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -333,6 +336,26 @@ public class Main extends Application {
         return login_scene;
     }
 
+    private void handleMouseClicked(MouseEvent event) {
+        Node node = event.getPickResult().getIntersectedNode();
+        // Accept clicks only on node cells, and not on empty spaces of the TreeView
+        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
+            TreeItem<ListElement> item = (TreeItem)view_root.getSelectionModel().getSelectedItem();
+            ListElement element = item.getValue();
+            if (element instanceof BikeOwner) {
+                global_selected_owner = item;
+                global_selected_barcode = null;
+            } else if (element instanceof Barcode) {
+                global_selected_owner = null;
+                global_selected_barcode = item;
+            } else {
+                global_selected_owner = null;
+                global_selected_barcode = null;
+                System.out.println("Don't know what you clicked.");
+            }
+        }
+    }
+
     public Scene setup_main_scene(Stage stage_main) {
 
         GridPane main_grid = get_grid();
@@ -344,13 +367,19 @@ public class Main extends Application {
         view_root = new TreeView<ListElement>();
         view_root.setShowRoot(false);
 
+        EventHandler<MouseEvent> mouseEventHandle = (MouseEvent event) -> {
+            handleMouseClicked(event);
+        };
+
+        view_root.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEventHandle);
+
+
         ChangeListener users_listener = new ChangeListener<TreeItem<ListElement>>() {
             public void changed(ObservableValue<? extends TreeItem<ListElement>> observable,
                                 TreeItem<ListElement> value_old, TreeItem<ListElement> value_new) {
 
                 if(value_new != null) {
                     ListElement element = value_new.getValue();
-
                     if (element instanceof BikeOwner) {
                         global_selected_owner = value_new;
                         global_selected_barcode = null;
