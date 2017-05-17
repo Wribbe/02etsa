@@ -29,7 +29,7 @@ public class Barcode implements ListElement {
      * Create a new Barcode instance using string.
      */
     public Barcode(String serial) {
-        this.serial = serial;
+        this.serial = String.format("%05d", new Integer(serial));
     }
 
     public String toString() {

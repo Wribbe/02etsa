@@ -72,11 +72,6 @@ public class Main extends Application {
     public static void main(String args[])
     {
         api = new Core();
-
-        api.newBikeOwner("Agda", "198901013829", "Hem Agda", "0701234567", "Agda@email.se");
-        api.newBikeOwner("Bosse", "199711013382", "Hem Bosse", "0701234724", "Bosse@email.se");
-        api.newBikeOwner("Cicci", "200302139382", "Hem Cicci", "0701235043", "Cicci@email.se");
-
         launch(args);
     }
 
@@ -461,7 +456,7 @@ public class Main extends Application {
 
         for (BikeOwner owner : api.listUsers()) {
             TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
-            int current_index = 0;
+            int current_index = 1;
             for (Barcode barcode : owner.getBarcodes()) {
                 BarcodeWrapper wrapper = new BarcodeWrapper(barcode, current_index);
                 item.getChildren().add(new TreeItem<ListElement>(wrapper, null));
@@ -469,6 +464,7 @@ public class Main extends Application {
             }
             users.getChildren().add(item);
         }
+        users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
 
         view_root.setRoot(users);
 

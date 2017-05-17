@@ -1,8 +1,10 @@
 package javadoc;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Random;
+
 
 /**
  * This class represents the data composing a BikeOwner inside of the Easy Parks
@@ -14,10 +16,11 @@ import java.util.ArrayList;
  */
 public class BikeOwner implements ListElement, Comparable {
 
-    private int num_args = 5;
-    private String[] fields = new String[num_args];
+    public static int NUM_ARGS = 6;
+    private String[] fields = new String[NUM_ARGS];
 
     private List<Barcode> barcodes;
+    private String pin;
 
     /**
      * Create a new BikeOwner instance.
@@ -28,48 +31,53 @@ public class BikeOwner implements ListElement, Comparable {
 
         int i = 0;
         int argc = args.length;
-        for (; i<argc && i<num_args; i++) {
+        for (; i<argc && i<NUM_ARGS; i++) {
             this.fields[i] = args[i].trim();
         }
         // Not enough parameters, default to empty string.
-        for (; i<num_args; i++) {
+        for (; i<NUM_ARGS; i++) {
             this.fields[i] = "";
         }
 
         barcodes = new ArrayList<Barcode>();
-        if (argc == 6) { // Barcodes supplied.
-            String[] tokens = args[5].split(Barcode.delimiter);
+        if (argc == NUM_ARGS+1) { // Barcodes supplied.
+            String[] tokens = args[NUM_ARGS].split(Barcode.delimiter);
             for (String code : Arrays.asList(tokens)) {
                 barcodes.add(new Barcode(code));
             }
         }
     }
+
+    /**
+     * @return users pin.
+     */
+    protected String pin() {return this.fields[0];}
     /**
      * @return users name.
      */
-    public String name() {return this.fields[0];}
+    public String name() {return this.fields[1];}
     /**
      * @return users ssn.
      */
-    public String ssn() {return this.fields[1];}
+    public String ssn() {return this.fields[2];}
     /**
      * @return users address.
      */
-    public String address() {return this.fields[2];}
+    public String address() {return this.fields[3];}
     /**
      * @return users phone.
      */
-    public String phone() {return this.fields[3];}
+    public String phone() {return this.fields[4];}
     /**
      * @return users email.
      */
-    public String email() {return this.fields[4];}
+    public String email() {return this.fields[5];}
 
     /**
      * @return users as String.
      */
     public String toString() {
-        return ssn()+" : "+name()+" : "+"PIN";
+        return ssn()+" : "+name()+" : "+pin();
     }
 
     /**
@@ -144,4 +152,5 @@ public class BikeOwner implements ListElement, Comparable {
     protected void update(BikeOwner other) {
         this.fields = other.getFields();
     }
+
 }
