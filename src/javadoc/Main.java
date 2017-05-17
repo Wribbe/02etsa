@@ -39,7 +39,7 @@ import java.util.LinkedList;
 public class Main extends Application {
 
     TreeItem global_selected_owner = null;
-    TreeItem global_selected_bike = null;
+    TreeItem global_selected_barcode = null;
 
     BarcodePrinterTestDriver printer;
 
@@ -338,25 +338,25 @@ public class Main extends Application {
 //        list_grid.add(view_root, 0, 0);
 
         // Set listener.
-//        view_root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ListElement>>() {
-//            public void changed(ObservableValue<? extends TreeItem<ListElement>> observable,
-//                                TreeItem<ListElement> value_old, TreeItem<ListElement> value_new) {
-//
-//                ListElement element = value_new.getValue();
-//
-//                if (element instanceof BikeOwner) {
-//                    global_selected_owner = value_new;
-//                    global_selected_bike = null;
-//                } else if (element instanceof Bike) {
-//                    global_selected_owner = null;
-//                    global_selected_bike = value_new;
-//                } else {
-//                    global_selected_owner = null;
-//                    global_selected_bike = null;
-//                    System.out.println("Don't know what you clicked.");
-//                }
-//            }
-//        });
+        view_root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ListElement>>() {
+            public void changed(ObservableValue<? extends TreeItem<ListElement>> observable,
+                                TreeItem<ListElement> value_old, TreeItem<ListElement> value_new) {
+
+                ListElement element = value_new.getValue();
+
+                if (element instanceof BikeOwner) {
+                    global_selected_owner = value_new;
+                    global_selected_barcode = null;
+                } else if (element instanceof Barcode) {
+                    global_selected_owner = null;
+                    global_selected_barcode = value_new;
+                } else {
+                    global_selected_owner = null;
+                    global_selected_barcode = null;
+                    System.out.println("Don't know what you clicked.");
+                }
+            }
+        });
 
         // Create statusbar and label.
         Label status_label = new Label("Status:");
@@ -387,23 +387,28 @@ public class Main extends Application {
             }
         });
 
-        OurButton button_add_bike = new OurButton("Add bike");
-        button_grid.add(button_add_bike, 1, 3);
-        button_add_bike.setOnAction(new EventHandler<ActionEvent>() {
+        OurButton button_add_barcode = new OurButton("Add barcode");
+        button_grid.add(button_add_barcode, 1, 3);
+        button_add_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_owner == null) {
                     status_bar.setText("Error: Please select a user.");
                     return;
                 }
-                // Add bike to user.
+                System.out.println("ADD BARCODE");
+                // Add barcode to user.
             }
         });
 
-        OurButton button_remove_bike = new OurButton("Remove bike");
-        button_grid.add(button_remove_bike, 1, 4);
-        button_remove_bike.setOnAction(new EventHandler<ActionEvent>() {
+        OurButton button_remove_barcode = new OurButton("Remove barcode");
+        button_grid.add(button_remove_barcode, 1, 4);
+        button_remove_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                System.out.println("REMOVE BIKE!");
+                if (global_selected_barcode == null) {
+                    status_bar.setText("Error: Please select a barcode.");
+                    return;
+                }
+                System.out.println("REMOVE barcode!");
             }
         });
 
