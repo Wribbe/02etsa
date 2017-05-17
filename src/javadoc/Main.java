@@ -337,7 +337,6 @@ public class Main extends Application {
                     actiontarget.setText("Welcome "+ inp_user + ".");
                     stage_main.setScene(main_scene);
                     stage_main.show();
-                    //printer = new BarcodePrinterTestDriver("mupp", 10, 10);
                 }
             }
         });
@@ -514,7 +513,14 @@ public class Main extends Application {
         button_grid.add(button_print_barcode, 1, 5);
         button_print_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                System.out.println("PRINT BARCODE!");
+                if (global_selected_barcode == null) {
+                    status_bar.setText("Error: Please select a barcode.");
+                    return;
+                }
+                if (printer == null) {
+                    printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
+                }
+                printer.printBarcode(((Barcode)global_selected_barcode.getValue()).toString());
             }
         });
 
