@@ -30,7 +30,7 @@ public class Barcode implements ListElement {
 
     @Override
     public boolean equals(Object o) {
-        Barcode barcode = (Barcode) o;
+        ListElement barcode = (ListElement) o;
         return this.serial.equals(barcode.toString());
     }
 }
