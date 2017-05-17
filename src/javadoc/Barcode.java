@@ -19,11 +19,19 @@ public class Barcode implements ListElement {
     public static final String delimiter = "::";
 
     /**
-     * Create a new Barcode instance.
+     * Create a new Barcode instance using int.
+     */
+    public Barcode(int serial) {
+        this.serial = String.format("%05d", serial);
+    }
+
+    /**
+     * Create a new Barcode instance using string.
      */
     public Barcode(String serial) {
         this.serial = serial;
     }
+
     public String toString() {
         return serial;
     }
