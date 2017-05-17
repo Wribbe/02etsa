@@ -45,10 +45,6 @@ public class Main extends Application {
 
     private static GUIAPI api;
 
-    BikeOwner Agda = new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
-    BikeOwner Bosse = new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
-    BikeOwner Cissi = new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
-
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
 
@@ -62,7 +58,12 @@ public class Main extends Application {
     public static void main(String args[])
     {
         launch(args);
+
         api = new Core();
+
+        api.newBikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
+        api.newBikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
+        api.newBikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
     }
 
     Scene login_scene, main_scene;

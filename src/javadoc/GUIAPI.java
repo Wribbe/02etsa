@@ -22,7 +22,7 @@ public interface GUIAPI {
      * @return boolean signaling successful addition.
      * @see BikeOwner
      * */
-    public boolean newBikeOwner(String[] values);
+    public boolean newBikeOwner(String... values);
 
     /**
      * Edit existing BikeOwner.
