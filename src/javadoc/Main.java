@@ -43,8 +43,6 @@ public class Main extends Application {
 
     BarcodePrinterTestDriver printer;
 
-    TreeItem<ListElement> users;
-
     BikeOwner Agda = new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
     BikeOwner Bosse = new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
     BikeOwner Cissi = new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
@@ -280,10 +278,10 @@ public class Main extends Application {
         TreeItem<ListElement> TreeItemAgda = new TreeItem<ListElement>(Agda, null);
 
         // Set up main rootItem.
-        users = new TreeItem<ListElement>(Agda, null);
+        //users = new TreeItem<ListElement>(Agda, null);
         TreeView<ListElement> view_root = new TreeView<ListElement>();
 
-        view_root.setRoot(users);
+        //view_root.setRoot(users);
         view_root.setShowRoot(false);
 
 //        for (int i=0; i<100; i++) {
