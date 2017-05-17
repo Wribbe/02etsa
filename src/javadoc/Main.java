@@ -318,24 +318,11 @@ public class Main extends Application {
 
         Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
 
-//        TreeItem<ListElement> TreeItemAgda = new TreeItem<ListElement>(Agda, null);
-
-        // Set up main rootItem.
-        //users = new TreeItem<ListElement>(Agda, null);
         view_root = new TreeView<ListElement>();
         view_root.setShowRoot(false);
         list_grid.add(view_root, 0, 0);
 
         update_view();
-//        for (int i=0; i<100; i++) {
-//          TreeItem<ListElement> item = new TreeItem<ListElement>(Agda, null);
-//          for (int j=0; j<20; j++) {
-//            TreeItem<ListElement> bike = new TreeItem<ListElement>(new Bike("Test"));
-//            item.getChildren().add(bike);
-//          }
-//          users.getChildren().add(item);
-//        }
-//        list_grid.add(view_root, 0, 0);
 
         // Set listener.
         view_root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ListElement>>() {
