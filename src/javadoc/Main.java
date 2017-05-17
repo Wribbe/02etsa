@@ -51,6 +51,7 @@ public class Main extends Application {
     private static GUIAPI api;
 
     private String[] popup_fields = {"Name", "SSN", "Address", "Phone", "Email"};
+    private String[] popup_formats = {".*", "[0-9]{12}", ".*", ".*", ".*"};
 
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
@@ -187,6 +188,7 @@ public class Main extends Application {
                 if (field.getText().trim().equals("")) {
                     return "Please put a value in field \""+popup_fields[current_index]+"\".";
                 }
+                if (
                 current_index++;
             }
             return "";
