@@ -262,10 +262,6 @@ public class Main extends Application {
         }
     }
 
-    public void add_user(BikeOwner user) {
-//        users.getChildren().add(new TreeItem<ListElement>(user));
-    }
-
     public void popup_handler(ActionEvent e, PopupBase popup) {
         popup.show();
     }
