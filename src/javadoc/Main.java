@@ -182,7 +182,7 @@ public class Main extends Application {
             EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
                 public void handle(ActionEvent e) {
                     output.setText(status_ok());
-                    add_user(Bosse);
+//                    add_user(Bosse);
                     dialog.close();
                 }
             };
@@ -279,7 +279,7 @@ public class Main extends Application {
 
         Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
 
-        TreeItem<ListElement> TreeItemAgda = new TreeItem<ListElement>(Agda, null);
+//        TreeItem<ListElement> TreeItemAgda = new TreeItem<ListElement>(Agda, null);
 
         // Set up main rootItem.
         //users = new TreeItem<ListElement>(Agda, null);
