@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Random;
 
 /**
  * Class that holds the core functionality of the Easy Park software stack.
@@ -20,11 +21,40 @@ public class Core implements GUIAPI {
      */
 
     private Map<String,BikeOwner> db;
+    private Random random;
+
+    private final String FULL = "asotaon32;y8aonest";
 
     private final int size_input_vars = 5;
+    private final long barcode_seed = 97234098;
+    private final int max_barcodes = 100000;
+    private int issued_barcodes = 0;
+
+    private int[] barcode_store = new int[max_barcodes];
 
     public Core() {
         db = new HashMap<String, BikeOwner>();
+
+        for (int i=0; i<max_barcodes; i++) {
+            barcode_store[i] = i;
+        }
+
+        random = new Random(barcode_seed);
+
+        // Assign all possible barcodes.
+        for (int i=0; i<max_barcodes; i++) {
+            barcode_store[i] = i;
+        }
+
+        // Shuffle based on seed.
+        for (int i = max_barcodes-1; i > 0; i--) {
+            // Get any element up to this current point, == don't reshuffle
+            // wherer we've already been.
+            int index = random.nextInt(i+1);
+            int temp = barcode_store[index];
+            barcode_store[index] = barcode_store[i];
+            barcode_store[i] = temp;
+        }
     }
 
     public boolean newBikeOwner(String... values){
@@ -64,6 +94,9 @@ public class Core implements GUIAPI {
             return false;
         }
         stored.add_barcode(barcode);
+        if (issued_barcodes < max_barcodes) {
+            issued_barcodes++;
+        }
         return true;
     }
 
@@ -74,6 +107,14 @@ public class Core implements GUIAPI {
             return false;
         }
         return stored.remove_barcode(barcode);
+    }
+
+    public int barcodesLeft() {
+        return max_barcodes - issued_barcodes - 1;
+    }
+
+    public Barcode newBarcode() {
+        return new Barcode(barcode_store[issued_barcodes]);
     }
 
     public List<BikeOwner> listUsers() {

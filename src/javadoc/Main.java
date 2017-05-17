@@ -66,9 +66,9 @@ public class Main extends Application {
     {
         api = new Core();
 
-        api.newBikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se", "CODE1");
-        api.newBikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se", "CODE2");
-        api.newBikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se", "CODE3");
+        api.newBikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
+        api.newBikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
+        api.newBikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
 
         launch(args);
     }
@@ -246,10 +246,6 @@ public class Main extends Application {
                 public void handle(ActionEvent e) {
                     if (validate()) {
                         output.setText(status_ok());
-                        Barcode new_code = new Barcode(fieldsAsArray()[0]);
-                        api.addBarcode((BikeOwner) owner.getValue(), new_code);
-                        owner.getChildren().add(new TreeItem<ListElement>(new_code, null));
-                        dialog.close();
                     }
                 }
             };
@@ -453,7 +449,22 @@ public class Main extends Application {
                     return;
                 }
                 TreeItem<ListElement> owner = global_selected_owner;
-                popup_handler(e, new PopupNewBarcode(status_bar, owner, "Barcode"));
+                Barcode new_code = api.newBarcode();
+                int left = api.barcodesLeft();
+                if (left > 0) {
+                    api.addBarcode((BikeOwner) owner.getValue(), new_code);
+                    owner.getChildren().add(new TreeItem<ListElement>(new_code, null));
+                    //owner.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
+                }
+                left = api.barcodesLeft();
+                if (left == 0) {
+                    status_bar.setText("Warning, no barcodes left!");
+                } else if (left < 100) {
+                    status_bar.setText("Warning, only: "+left+" barcodes left!");
+                } else {
+                    status_bar.setText(left+" barcodes left.");
+                }
+                return;
             }
         });
 
@@ -474,7 +485,7 @@ public class Main extends Application {
                 global_selected_barcode.getParent().getChildren().remove(global_selected_barcode);
                 global_selected_barcode = null;
 
-                status_bar.setText("Successfully removed: "+to_be_removed.toString()+" from: "+owner.name()+".");
+                status_bar.setText("Successfully removed: "+to_be_removed.toString());
             }
         });
 

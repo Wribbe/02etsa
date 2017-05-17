@@ -59,5 +59,16 @@ public interface GUIAPI {
      * @return list containing all BikeOwner object in database.
      * */
     public List<BikeOwner> listUsers();
-}
 
+    /**
+     * Get a unique Barcode.
+     * @return new unique Barcode instance.
+     * */
+    public Barcode newBarcode();
+
+    /**
+     * Get number of unique barcodes left.
+     * @return new unique Barcode instance.
+     * */
+    public int barcodesLeft();
+}
