@@ -51,7 +51,8 @@ public class Main extends Application {
     private static GUIAPI api;
 
     private String[] popup_fields = {"Name", "SSN", "Address", "Phone", "Email"};
-    private String[] popup_formats = {".*", "[0-9]{12}", ".*", ".*", ".*"};
+    private String FORMAT_DATE = "DATEFORMAT";
+    private String[] formats_popup = {".*", FORMAT_DATE, ".*", "\\d{9,10}", ".+@.+\\..+"};
 
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
@@ -185,10 +186,29 @@ public class Main extends Application {
         private String validate() {
             int current_index = 0;
             for (OurTextField field : fields) {
-                if (field.getText().trim().equals("")) {
-                    return "Please put a value in field \""+popup_fields[current_index]+"\".";
+
+                String field_name = popup_fields[current_index];
+                String field_value = field.getText().trim();
+                String format_string = formats_popup[current_index];
+
+                if (field_value.equals("")) {
+                  return "Please put a value in field \""+field_name+"\".";
                 }
-                if (
+                if (format_string.equals(FORMAT_DATE)) {
+                  if (!field_value.matches("\\d{12}")) {
+                    return field_name+" needs to be 12 digits.";
+                  }
+                  Integer month = new Integer(field_value.substring(4,6));
+                  Integer day = new Integer(field_value.substring(6,8));
+                  if (month > 12 || month < 1) {
+                    return field_name+" month needs to be between 1-12.";
+                  }
+                  if (day > 31 | day < 1) {
+                    return field_name+" day needs to be between 1-31.";
+                  }
+                } else if(!field_value.matches(format_string)){
+                  return field_name+" has wrong format.";
+                }
                 current_index++;
             }
             return "";
