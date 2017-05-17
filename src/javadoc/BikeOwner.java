@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * @version 0.9
  * @since 0.1
  */
-public class BikeOwner implements ListElement{
+public class BikeOwner implements ListElement, Comparable {
 
     private int num_args = 5;
     private String[] fields = new String[num_args];
@@ -85,6 +85,16 @@ public class BikeOwner implements ListElement{
      */
     public boolean remove_barcode(Barcode barcode) {
         return barcodes.remove(barcode);
+    }
+
+    /**
+     * @param o Object to be compeered to.
+     * @return integer < 0 if this is < then o, == 0 if this == 0 and > 0 if
+     * this > 0.
+     */
+    public int compareTo(Object o) {
+        BikeOwner other = (BikeOwner) o;
+        return name().compareTo(other.name());
     }
 
     /**
