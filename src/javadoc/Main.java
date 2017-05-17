@@ -392,6 +392,33 @@ public class Main extends Application {
         }
     }
 
+    private class BarcodeWrapper extends Barcode {
+
+      public int number = 0;
+      private Barcode barcode;
+
+      public BarcodeWrapper(String string, int number) {
+        super(string);
+        this.number = number;
+      }
+
+      public BarcodeWrapper(Integer integer, int number) {
+        super(integer);
+        this.number = number;
+      }
+
+      public BarcodeWrapper(Barcode barcode, int number) {
+        super(barcode.toString());
+        this.number = number;
+        this.barcode = barcode;
+      }
+
+      public String toString() {
+        return "Bike "+number+": "+super.toString();
+      }
+
+    }
+
     public Scene setup_main_scene(Stage stage_main) {
 
         GridPane main_grid = get_grid();
@@ -439,8 +466,11 @@ public class Main extends Application {
 
         for (BikeOwner owner : api.listUsers()) {
             TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
+            int current_index = 0;
             for (Barcode barcode : owner.getBarcodes()) {
-                item.getChildren().add(new TreeItem<ListElement>(barcode, null));
+                BarcodeWrapper wrapper = new BarcodeWrapper(barcode, current_index);
+                item.getChildren().add(new TreeItem<ListElement>(wrapper, null));
+                current_index++;
             }
             users.getChildren().add(item);
         }
@@ -499,7 +529,9 @@ public class Main extends Application {
                 int left = api.barcodesLeft();
                 if (left > 0) {
                     api.addBarcode((BikeOwner) owner.getValue(), new_code);
-                    owner.getChildren().add(new TreeItem<ListElement>(new_code, null));
+                    int num_bikes = owner.getChildren().size()+1;
+                    BarcodeWrapper wrapper = new BarcodeWrapper(new_code, num_bikes);
+                    owner.getChildren().add(new TreeItem<ListElement>(wrapper, null));
                     //owner.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
                 }
                 left = api.barcodesLeft();
@@ -528,8 +560,17 @@ public class Main extends Application {
                 api.removeBarcode(owner, to_be_removed);
 
                 // Remove from gui.
-                global_selected_barcode.getParent().getChildren().remove(global_selected_barcode);
+                List<TreeItem<ListElement>> children = global_selected_barcode.getParent().getChildren();
+                children.remove(global_selected_barcode);
                 global_selected_barcode = null;
+
+                // Update wrapper numbers.
+                int current_index = 1;
+                for (TreeItem<ListElement> child : children) {
+                  BarcodeWrapper wrapper = (BarcodeWrapper)child.getValue();
+                  wrapper.number = current_index;
+                  current_index++;
+                }
 
                 status_bar.setText("Successfully removed: "+to_be_removed.toString());
             }
