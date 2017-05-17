@@ -59,9 +59,9 @@ public class Main extends Application {
     {
         api = new Core();
 
-        api.newBikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
-        api.newBikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
-        api.newBikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
+        api.newBikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se", "CODE1");
+        api.newBikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se", "CODE2");
+        api.newBikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se", "CODE3");
 
         launch(args);
     }
@@ -283,11 +283,20 @@ public class Main extends Application {
 
         // Set up main rootItem.
         //users = new TreeItem<ListElement>(Agda, null);
+        TreeItem<ListElement> users = new TreeItem<ListElement>();
         TreeView<ListElement> view_root = new TreeView<ListElement>();
 
-        //view_root.setRoot(users);
+        view_root.setRoot(users);
         view_root.setShowRoot(false);
 
+        for (BikeOwner owner : api.listUsers()) {
+            TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
+            for (Barcode barcode : owner.getBarcodes()) {
+                item.getChildren().add(new TreeItem<ListElement>(barcode, null));
+            }
+            users.getChildren().add(item);
+        }
+        list_grid.add(view_root, 0, 0);
 //        for (int i=0; i<100; i++) {
 //          TreeItem<ListElement> item = new TreeItem<ListElement>(Agda, null);
 //          for (int j=0; j<20; j++) {
