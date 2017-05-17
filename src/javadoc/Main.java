@@ -421,8 +421,7 @@ public class Main extends Application {
         // Set buttons.
         OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
-        PopupBase new_user = new PopupNewUser(status_bar, "Name", "SSN", "Address", "Phone", "Email");
-        button_new_user.setOnAction(e-> popup_handler(e, new_user));
+        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(status_bar, "Name", "SSN", "Address", "Phone", "Email")));
 
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
