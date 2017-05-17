@@ -54,6 +54,8 @@ public class Main extends Application {
     private String FORMAT_DATE = "DATEFORMAT";
     private String[] formats_popup = {".*", FORMAT_DATE, ".*", "\\d{9,10}", ".+@.+\\..+"};
 
+    private final int MAX_BARCODES = 2;
+
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
 
@@ -524,6 +526,11 @@ public class Main extends Application {
                     status_bar.setText("Error: Please select a user.");
                     return;
                 }
+                if (global_selected_owner.getChildren().size() >= MAX_BARCODES) {
+                    status_bar.setText("Maximum number of bikes registered.");
+                    return;
+                }
+
                 TreeItem<ListElement> owner = global_selected_owner;
                 Barcode new_code = api.newBarcode();
                 int left = api.barcodesLeft();
