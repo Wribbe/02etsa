@@ -261,7 +261,7 @@ public class Main extends Application {
                     actiontarget.setText("Welcome "+ inp_user + ".");
                     stage_main.setScene(main_scene);
                     stage_main.show();
-                    printer = new BarcodePrinterTestDriver("mupp", 10, 10);
+                    //printer = new BarcodePrinterTestDriver("mupp", 10, 10);
                 }
             }
         });
