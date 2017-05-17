@@ -30,6 +30,8 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import hardware_testdrivers.BarcodePrinterTestDriver;
+
 //import hardware_testdrivers.BarcodePrinterTestDriver;
 
 import java.util.LinkedList;
@@ -38,6 +40,8 @@ public class Main extends Application {
 
     TreeItem global_selected_owner = null;
     TreeItem global_selected_bike = null;
+
+    BarcodePrinterTestDriver printer;
 
     TreeItem<ListElement> users;
 
@@ -255,6 +259,7 @@ public class Main extends Application {
                     actiontarget.setText("Welcome "+ inp_user + ".");
                     stage_main.setScene(main_scene);
                     stage_main.show();
+                    printer = new BarcodePrinterTestDriver("mupp", 10, 10);
                 }
             }
         });
