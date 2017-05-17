@@ -98,6 +98,13 @@ public class BikeOwner implements ListElement, Comparable {
     }
 
     /**
+     * @return List with copy of all Barcode instances.
+     */
+    public List<Barcode> getBarcodes() {
+        return new ArrayList(barcodes);
+    }
+
+    /**
      * @return String array containing all the fields of the BikeOwner.
      */
     protected String[] fields() {
