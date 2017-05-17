@@ -216,9 +216,9 @@ public class Main extends Application {
 
     private class PopupNewBarcode extends PopupBase {
 
-        private BikeOwner owner;
+        private TreeItem<ListElement> owner;
 
-        public PopupNewBarcode(Text output, BikeOwner owner, String... input_fields) {
+        public PopupNewBarcode(Text output, TreeItem<ListElement> owner, String... input_fields) {
             super("New Barcode", output, input_fields);
             this.owner = owner;
         }
@@ -246,7 +246,9 @@ public class Main extends Application {
                 public void handle(ActionEvent e) {
                     if (validate()) {
                         output.setText(status_ok());
-                        api.addBarcode(owner, new Barcode(fieldsAsArray()[0]));
+                        Barcode new_code = new Barcode(fieldsAsArray()[0]);
+                        api.addBarcode((BikeOwner) owner.getValue(), new_code);
+                        owner.getChildren().add(new TreeItem<ListElement>(new_code, null));
                         dialog.close();
                     }
                 }
@@ -451,7 +453,7 @@ public class Main extends Application {
                     status_bar.setText("Error: Please select a user.");
                     return;
                 }
-                BikeOwner owner = (BikeOwner) global_selected_owner.getValue();
+                TreeItem<ListElement> owner = global_selected_owner;
                 popup_handler(e, new PopupNewBarcode(status_bar, owner, "Barcode"));
             }
         });
