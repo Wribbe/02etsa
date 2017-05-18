@@ -74,6 +74,9 @@ public class HW implements HWAPI {
         }
 
         public boolean validate() {
+            if (last_barcode == null) {
+                return false;
+            }
             if (entry) {
                 try {
                     core.park(last_barcode);
@@ -87,7 +90,11 @@ public class HW implements HWAPI {
         }
 
         public void handleBarcode(String barcode) {
-            last_barcode = new Barcode(barcode);
+            try {
+                last_barcode = new Barcode(barcode);
+            } catch (NumberFormatException e) {
+                last_barcode = null;
+            }
         }
     }
 
