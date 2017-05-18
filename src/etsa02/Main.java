@@ -153,7 +153,7 @@ public class Main extends Application {
             dialog.setScene(scene);
             // Focus on first field.
             fields.get(0).requestFocus();
-            scene.getStylesheets().add(Main.class.getResource("../etsa02/login.css").toExternalForm());
+            scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
 
         }
 
@@ -327,7 +327,7 @@ public class Main extends Application {
 
     public void set_style(Scene scene)
     {
-        String resource = Main.class.getResource("../etsa02/login.css").toExternalForm();
+        String resource = Main.class.getResource("login.css").toExternalForm();
         scene.getStylesheets().add(resource);
     }
 
