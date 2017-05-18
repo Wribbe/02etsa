@@ -1,2 +1,6 @@
 /bin/
 *.class
+*.swp
+*.log
+doc
+database.txt
