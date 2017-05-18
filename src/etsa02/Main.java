@@ -127,7 +127,6 @@ public class Main extends Application {
             dialog.setHeight(POPUP_HEIGHT);
             dialog.setMinWidth(POPUP_WIDTH);
             dialog.setMinHeight(POPUP_HEIGHT);
-            dialog.setResizable(false);
 
             grid = get_grid();
 
@@ -704,7 +703,6 @@ public class Main extends Application {
         stage_main.setHeight(LOGIN_HEIGHT);
         stage_main.setMinWidth(LOGIN_WIDTH);
         stage_main.setMinHeight(LOGIN_HEIGHT);
-        stage_main.setResizable(false);
 
         stage_main.setTitle("EasyPark -- Ultimate garage maintainer.");
 
