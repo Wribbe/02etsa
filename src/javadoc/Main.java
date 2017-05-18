@@ -20,6 +20,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeCell;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -620,15 +621,30 @@ public class Main extends Application {
         // Add search bar.
         GridPane search_grid = get_grid(Pos.TOP_LEFT);
         OurButton button_search = new OurButton("Search");
-        OurTextField bar_search = new OurTextField(button_search);
-        search_grid.add(bar_search, 0, 0);
+        OurTextField input_search = new OurTextField(button_search);
+        search_grid.add(input_search, 0, 0);
         search_grid.add(button_search, 1, 0);
         main_grid.add(search_grid, 0, 1);
 
         // Setup search button.
         button_search.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                bar_status.setText("Search");
+                String ssn_to_find = input_search.getText().trim();
+                if (ssn_to_find.equals("")) {
+                    bar_status.setText("Please enter a SSN to search for.");
+                    return;
+                }
+                List<TreeItem<ListElement>> user_list = users.getChildren();
+                for (TreeItem<ListElement> user : user_list) {
+                    BikeOwner owner = (BikeOwner) user.getValue();
+                    if (owner.ssn().equals(ssn_to_find)) {
+                        MultipleSelectionModel model = view_root.getSelectionModel();
+                        int row = view_root.getRow(user);
+                        model.select(row);
+                        return;
+                    }
+                }
+                bar_status.setText("Nothing found for: "+ssn_to_find);
             }
         });
 
