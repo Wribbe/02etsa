@@ -16,9 +16,9 @@ import hardware_interfaces.PincodeTerminal;
 /**
  * Interface for handling which methods are available for current hardware peripherals.
  * */
-public interface HWAPI extends PincodeObserver, BarcodeObserver {
+public interface HWAPI {
 
-    public void addLock(ElectronicLock lock);
+    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock);
 
-    public void addTerminal(PincodeTerminal terimal);
+    public void register_and_link(PincodeTerminal terminal, ElectronicLock lock);
 }

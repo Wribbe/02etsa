@@ -9,13 +9,12 @@ import hardware_interfaces.PincodeTerminal;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HW implements HWAPI {
 
     private Core core;
-    private ElectronicLock lock;
-    private PincodeTerminal terminal;
-
-    private Signal errorCommon;
 
     private int RED = PincodeTerminal.RED_LED;
     private int GREEN = PincodeTerminal.GREEN_LED;
@@ -23,7 +22,6 @@ public class HW implements HWAPI {
     private long lastTimePushed;
 
     private StringBuilder currentQueue = new StringBuilder();
-
     private Signal running_signal = null;
 
     public HW(Core core) {
@@ -31,19 +29,34 @@ public class HW implements HWAPI {
         lastTimePushed = System.currentTimeMillis();
     }
 
-    public void addLock(ElectronicLock lock) {
-        this.lock = lock;
-    }
+    private List<Warden> wardens = new ArrayList<Warden>();
 
-    public void addTerminal(PincodeTerminal terminal) {
-        this.terminal = terminal;
-    }
+    private class Warden implements PincodeObserver, BarcodeObserver {
 
-    public void handleBarcode(String string) {
-        if (string.equals("g")) {
-            terminal.lightLED(PincodeTerminal.GREEN_LED, 3);
+        public Warden(PincodeTerminal terminal, ElectronicLock lock) {
+            terminal.registerObserver(this);
         }
-        System.out.println(string);
+
+        public Warden(BarcodeScanner scanner, ElectronicLock lock) {
+            scanner.registerObserver(this);
+        }
+
+        public void handleCharacter(char c) {
+            System.out.println(c);
+        }
+
+        public void handleBarcode(String barcode) {
+            System.out.println(barcode);
+        }
+
+    }
+
+    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock) {
+        wardens.add(new Warden(scanner, lock));
+    }
+
+    public void register_and_link(PincodeTerminal terminal, ElectronicLock lock) {
+        wardens.add(new Warden(terminal, lock));
     }
 
     public void handleCharacter(char c) {
@@ -84,6 +97,9 @@ public class HW implements HWAPI {
             currentQueue.append(c);
         }
     }
+
+    PincodeTerminal terminal;
+    ElectronicLock lock;
 
     private void Ok() {
         Signal ok = new Signal(terminal, GREEN, 20*1000, 0, 1);

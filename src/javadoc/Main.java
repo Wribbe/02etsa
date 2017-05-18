@@ -48,8 +48,10 @@ public class Main extends Application {
     TreeItem global_selected_barcode = null;
 
     BarcodePrinterTestDriver printer;
-    BarcodeScannerTestDriver scanner;
-    ElectronicLockTestDriver lock;
+    BarcodeScannerTestDriver scanner_entry;
+    BarcodeScannerTestDriver scanner_exit;
+    ElectronicLockTestDriver lock_entry;
+    ElectronicLockTestDriver lock_exit;
     PincodeTerminalTestDriver terminal;
 
     private static GUIAPI api;
@@ -606,16 +608,19 @@ public class Main extends Application {
                     return;
                 }
                 if (printer == null) {
-                    printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
-                    scanner = new BarcodeScannerTestDriver("Barcode Scanner", 10, 20);
-                    lock = new ElectronicLockTestDriver("Electronic Lock", 10, 30);
-                    terminal = new PincodeTerminalTestDriver("Pincode Terminal", 10, 40);
-                    scanner.registerObserver(api.HW());
-                    terminal.registerObserver(api.HW());
 
-                    // Add hardware to HW instance.
-                    api.HW().addLock(lock);
-                    api.HW().addTerminal(terminal);
+                    printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
+                    scanner_entry = new BarcodeScannerTestDriver("Barcode Entry Scanner", 10, 20);
+                    scanner_exit = new BarcodeScannerTestDriver("Barcode Exit Scanner", 10, 30);
+                    lock_entry = new ElectronicLockTestDriver("Electronic Entry Lock", 10, 40);
+                    lock_exit = new ElectronicLockTestDriver("Electronic Exit Lock", 10, 50);
+                    terminal = new PincodeTerminalTestDriver("Pincode Terminal", 10, 60);
+
+                    api.HW().register_and_link(scanner_entry, lock_entry);
+                    api.HW().register_and_link(terminal, lock_entry);
+
+                    api.HW().register_and_link(scanner_exit, lock_exit);
+
                 }
                 printer.printBarcode(((Barcode)global_selected_barcode.getValue()).serial());
             }
