@@ -379,6 +379,24 @@ public class Main extends Application {
                     actiontarget.setText("Welcome "+ inp_user + ".");
                     stage_main.setScene(main_scene);
                     stage_main.show();
+
+                    // Setup HW-interface.
+                    printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
+                    scanner_entry = new BarcodeScannerTestDriver("Barcode Entry Scanner", 10, 20);
+                    scanner_exit = new BarcodeScannerTestDriver("Barcode Exit Scanner", 10, 30);
+                    lock_entry = new ElectronicLockTestDriver("Electronic Entry Lock", 10, 40);
+                    lock_exit = new ElectronicLockTestDriver("Electronic Exit Lock", 10, 50);
+                    terminal = new PincodeTerminalTestDriver("Pincode Terminal", 10, 60);
+
+                    boolean ENTRY = true;
+
+                    PincodeTerminal output_entry = terminal;
+                    PincodeTerminal output_exit = null;
+
+                    api.HW().register_and_link(scanner_entry, lock_entry, ENTRY, output_entry);
+                    api.HW().register_and_link(terminal, lock_entry);
+
+                    api.HW().register_and_link(scanner_exit, lock_exit, !ENTRY, output_exit);
                 }
             }
         });
@@ -606,26 +624,6 @@ public class Main extends Application {
                 if (global_selected_barcode == null) {
                     bar_status.setText("Error: Please select a barcode.");
                     return;
-                }
-                if (printer == null) {
-
-                    printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
-                    scanner_entry = new BarcodeScannerTestDriver("Barcode Entry Scanner", 10, 20);
-                    scanner_exit = new BarcodeScannerTestDriver("Barcode Exit Scanner", 10, 30);
-                    lock_entry = new ElectronicLockTestDriver("Electronic Entry Lock", 10, 40);
-                    lock_exit = new ElectronicLockTestDriver("Electronic Exit Lock", 10, 50);
-                    terminal = new PincodeTerminalTestDriver("Pincode Terminal", 10, 60);
-
-                    boolean ENTRY = true;
-
-                    PincodeTerminal output_entry = terminal;
-                    PincodeTerminal output_exit = null;
-
-                    api.HW().register_and_link(scanner_entry, lock_entry, ENTRY, output_entry);
-                    api.HW().register_and_link(terminal, lock_entry);
-
-                    api.HW().register_and_link(scanner_exit, lock_exit, !ENTRY, output_exit);
-
                 }
                 printer.printBarcode(((Barcode)global_selected_barcode.getValue()).serial());
             }
