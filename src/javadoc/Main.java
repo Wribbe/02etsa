@@ -619,10 +619,13 @@ public class Main extends Application {
 
                     boolean ENTRY = true;
 
-                    api.HW().register_and_link(scanner_entry, lock_entry, ENTRY);
+                    PincodeTerminal output_entry = terminal;
+                    PincodeTerminal output_exit = null;
+
+                    api.HW().register_and_link(scanner_entry, lock_entry, ENTRY, output_entry);
                     api.HW().register_and_link(terminal, lock_entry);
 
-                    api.HW().register_and_link(scanner_exit, lock_exit, !ENTRY);
+                    api.HW().register_and_link(scanner_exit, lock_exit, !ENTRY, output_exit);
 
                 }
                 printer.printBarcode(((Barcode)global_selected_barcode.getValue()).serial());

@@ -66,16 +66,28 @@ public class HW implements HWAPI {
 
     private class ScannerValidator implements Validator, BarcodeObserver {
 
-        public ScannerValidator(boolean entry) {
+        private boolean entry;
+        private Barcode last_barcode;
 
+        public ScannerValidator(boolean entry) {
+            this.entry = entry;
         }
 
         public boolean validate() {
+            if (entry) {
+                try {
+                    core.park(last_barcode);
+                } catch (GarageFullException e) {
+                    return false;
+                } catch (AlreadyParkedException e) {
+                    return false;
+                }
+            }
             return true;
         }
 
         public void handleBarcode(String barcode) {
-
+            last_barcode = new Barcode(barcode);
         }
     }
 
@@ -94,12 +106,7 @@ public class HW implements HWAPI {
 
         private Validator validator;
 
-        public Warden(PincodeTerminal terminal, ElectronicLock lock) {
-            validator = new PincodeValidator();
-            terminal.registerObserver(this);
-            this.terminal = terminal;
-            this.lock = lock;
-
+        private void setupSignals() {
             SIG_OK = new Signal(terminal, GREEN, 20*1000, 0, 1);
             SIG_ERR_NORMAL = new Signal(terminal, RED, 1000, 1000, 3);
             SIG_ERR_BLOCKED = new Signal(terminal, RED, 1000, 1000, 9);
@@ -107,22 +114,38 @@ public class HW implements HWAPI {
             SIG_OK.prioritized = true;
         }
 
-        public Warden(BarcodeScanner scanner, ElectronicLock lock, boolean entry) {
+        public Warden(PincodeTerminal terminal, ElectronicLock lock) {
+            validator = new PincodeValidator();
+            terminal.registerObserver(this);
+            this.terminal = terminal;
+            this.lock = lock;
+            setupSignals();
+        }
+
+        public Warden(BarcodeScanner scanner, ElectronicLock lock, boolean entry, PincodeTerminal output) {
             validator = new ScannerValidator(entry);
             scanner.registerObserver(this);
             this.scanner = scanner;
+            this.terminal = output;
             this.lock = lock;
+            setupSignals();
         }
 
         public void handleBarcode(String barcode) {
-
+            ((BarcodeObserver)validator).handleBarcode(barcode);
+            if (validator.validate()) {
+                lock.open(20);
+                SIG_OK.start();
+            } else {
+                SIG_ERR_NORMAL.start();
+            }
         }
 
         public void handleCharacter(char c) {
             if (c == '#') {
                 if (validator.validate()) {
-                    lock.open(20);
                     SIG_OK.start();
+                    lock.open(20);
                 } else {
                     SIG_ERR_NORMAL.start();
                 }
@@ -133,8 +156,8 @@ public class HW implements HWAPI {
 
     }
 
-    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock, boolean entry) {
-        wardens.add(new Warden(scanner, lock, entry));
+    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock, boolean entry, PincodeTerminal output) {
+        wardens.add(new Warden(scanner, lock, entry, output));
     }
 
     public void register_and_link(PincodeTerminal terminal, ElectronicLock lock) {
@@ -160,6 +183,9 @@ public class HW implements HWAPI {
         }
 
         public void start() {
+            if (terminal == null) {
+                return;
+            }
             if (thread == null || !thread.isAlive()) {
                 thread = new Thread(this);
                 thread.start();
