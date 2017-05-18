@@ -626,7 +626,7 @@ public class Main extends Application {
         status_grid.add(bar_status, 1, 0, 2, 1);
 
         // Add status_grid to main grid.
-        main_grid.add(status_grid, 0, 2);
+        main_grid.add(status_grid, 0, 2, 2, 1);
 
         // Set window style.
         set_style(main_scene);
