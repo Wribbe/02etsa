@@ -46,6 +46,8 @@ public class Core implements GUIAPI {
 
     private String error = null;
 
+    private HWAPI HW;
+
     public Core() {
 
         SetupBarcodeDatabase();
@@ -75,6 +77,7 @@ public class Core implements GUIAPI {
                 // Ignore.
             }
         }
+        HW = new HW();
     }
 
     private String regex_pin = "\\d{4}";
