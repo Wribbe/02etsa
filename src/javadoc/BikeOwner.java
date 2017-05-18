@@ -20,12 +20,11 @@ public class BikeOwner implements ListElement, Comparable {
     private String[] fields = new String[NUM_ARGS];
 
     private List<Barcode> barcodes;
-    private String pin;
 
     /**
      * Create a new BikeOwner instance.
      *
-     * @param args 5 consecutive strings; name, ssn, address, phone and email.
+     * @param args 6 consecutive strings; pin, name, ssn, address, phone and email.
      */
     public BikeOwner(String... args) {
 
@@ -111,6 +110,14 @@ public class BikeOwner implements ListElement, Comparable {
     public List<Barcode> getBarcodes() {
         return new ArrayList(barcodes);
     }
+
+    /**
+     * @param pin String that represents new pin.
+     */
+    public void setPin(String pin) {
+        fields[0] = pin;
+    }
+
 
     /**
      * @return String array containing all the fields of the BikeOwner.

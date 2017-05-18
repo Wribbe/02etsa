@@ -77,17 +77,15 @@ public class Core implements GUIAPI {
         }
     }
 
+    private String regex_pin = "\\d{4}";
+
     public boolean newBikeOwner(String... values){
-        if (values.length < BikeOwner.NUM_ARGS-1) {
-            String[] include_pin =  new String[values.length+1];
-            include_pin[0] = getPin();
-            System.arraycopy(values, 0, include_pin, 1, values.length);
-            BikeOwner new_owner = new BikeOwner(include_pin);
-            db.put(new_owner.ssn(), new_owner);
-        } else {
-            BikeOwner new_owner = new BikeOwner(values);
-            db.put(new_owner.ssn(), new_owner);
+        BikeOwner new_owner;
+        if (!values[0].matches(regex_pin) && values.length <= BikeOwner.NUM_ARGS) {
+            values[0] = getPin();
         }
+        new_owner = new BikeOwner(values);
+        db.put(new_owner.ssn(), new_owner);
         save();
         return true;
     }
@@ -157,6 +155,18 @@ public class Core implements GUIAPI {
         List list = new ArrayList<BikeOwner>(db.values());
         Collections.sort(list);
         return list;
+    }
+
+    public String pin(String ssn) throws IOException {
+        BikeOwner stored = db.get(ssn);
+        if (stored == null) {
+            throw new IOException("No user with ssn: "+ssn+" found.");
+        }
+        return stored.pin();
+    }
+
+    public void setPin(BikeOwner owner, String ssn) {
+        owner.setPin(ssn);
     }
 
     private List<String> list_users_encoded() {

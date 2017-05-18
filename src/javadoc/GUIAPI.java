@@ -1,6 +1,7 @@
 package javadoc;
 
 import java.util.List;
+import java.io.IOException;
 
 /**
  * @author AUTHOR-TAG
@@ -72,4 +73,20 @@ public interface GUIAPI {
      * @return new unique Barcode instance.
      * */
     public int barcodesLeft();
+
+    /**
+     * Get pin for user with SSN.
+     * @param ssn SSN for user of pin.
+     * @throws IOExeption if user not found.
+     * @return String representing pin for user.
+     * */
+    public String pin(String ssn) throws IOException;
+
+    /**
+     * Set pin for user with SSN.
+     * @param owner owner that should have new pin.
+     * @param pin new pin.
+     * @throws IOExeption if user not found.
+     * */
+    public void setPin(BikeOwner owner, String pin);
 }

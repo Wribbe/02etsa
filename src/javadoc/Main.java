@@ -35,6 +35,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
 
+import java.io.IOException;
+
 import hardware_testdrivers.BarcodePrinterTestDriver;
 
 //import hardware_testdrivers.BarcodePrinterTestDriver;
@@ -150,6 +152,8 @@ public class Main extends Application {
 
         public String[] fieldsAsArray() {
             List<String> list = new ArrayList<String>();
+            // Pad pin with empty string to make ssn() return correct value.
+            list.add("");
             for (OurTextField field : fields) {
                 list.add(field.getText().trim());
             }
@@ -228,7 +232,14 @@ public class Main extends Application {
                         output.setText(status_ok());
                         api.newBikeOwner(fieldsAsArray());
                         TreeItem<ListElement> item;
-                        item = new TreeItem<ListElement>(new BikeOwner(fieldsAsArray()), null);
+                        BikeOwner guiOwner = new BikeOwner(fieldsAsArray());
+                        try {
+                            String pin = api.pin(guiOwner.ssn());
+                            api.setPin(guiOwner, pin);
+                        } catch (IOException ioe) {
+                            api.setPin(guiOwner, "");
+                        }
+                        item = new TreeItem<ListElement>(guiOwner, null);
                         users.getChildren().add(item);
                         users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
                         dialog.close();
