@@ -7,6 +7,8 @@ import hardware_interfaces.BarcodeScanner;
 import hardware_interfaces.ElectronicLock;
 import hardware_interfaces.PincodeTerminal;
 
+import java.io.IOException;
+
 public class HW implements HWAPI {
 
     private Core core;
@@ -62,23 +64,39 @@ public class HW implements HWAPI {
 
             String current_pin = currentQueue.substring(start, stop);
             currentQueue = new StringBuilder();
-            System.out.println(current_pin);
 
-            commonError();
+            try {
+              core.userWithPin(current_pin);
+            } catch (IOException e) {
+              commonError();
+            }
+
+            Ok();
+
+        } else if (c == '*') {
+
+          // Reset input.
+          currentQueue = new StringBuilder();
 
         } else {
             currentQueue.append(c);
         }
     }
 
+    private void Ok() {
+        Signal ok = new Signal(terminal, GREEN, 20*1000, 0, 1);
+        Thread t = new Thread(ok);
+        t.start();
+    }
+
     private void severeError() {
-        Signal errorCommon = new Signal(terminal, RED, 1000, 9);
+        Signal errorCommon = new Signal(terminal, RED, 1000, 1000, 9);
         Thread t = new Thread(errorCommon);
         t.start();
     }
 
     private void commonError() {
-        Signal errorCommon = new Signal(terminal, RED, 1000, 3);
+        Signal errorCommon = new Signal(terminal, RED, 1000, 1000, 3);
         Thread t = new Thread(errorCommon);
         t.start();
     }
@@ -90,12 +108,14 @@ public class HW implements HWAPI {
         private int color;
         private int flashes = 0;
         private int done = 0;
+        private int duration = 0;
 
-        public Signal(PincodeTerminal terminal, int color, long delay, int flashes) {
+        public Signal(PincodeTerminal terminal, int color, int duration, long delay, int flashes) {
             this.terminal = terminal;
             this.color = color;
             this.delay = delay;
             this.flashes = flashes;
+            this.duration = duration;
         }
 
         public void run() {
@@ -106,9 +126,9 @@ public class HW implements HWAPI {
             }
             try {
                 while (done < flashes) {
-                    terminal.lightLED(color, 1);
+                    terminal.lightLED(color, duration/1000);
                     done++;
-                    Thread.sleep(delay+1000);
+                    Thread.sleep(delay+duration);
                 }
             } catch (InterruptedException e) {
                 return;

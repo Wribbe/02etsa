@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
 import java.util.NoSuchElementException;
+import java.io.IOException;
 
 /**
  * Class that holds the core functionality of the Easy Park software stack.
@@ -39,7 +40,7 @@ public class Core implements GUIAPI {
     private final int MAX_PARKED = 100;
 
     private Map<String,BikeOwner> db;
-    private Map<String,List<BikeOwner>> pin_lookup;
+    private Map<String,BikeOwner> pin_lookup;
 
     private Random random;
     private int[] barcode_store;
@@ -58,7 +59,7 @@ public class Core implements GUIAPI {
         database_file = Paths.get(DATABASE_PATH);
 
         db = new HashMap<String, BikeOwner>();
-        pin_lookup = new HashMap<String, List<BikeOwner>>();
+        pin_lookup = new HashMap<String, BikeOwner>();
 
         barcode_store = fill_with_shuffled_numbers(MAX_BARCODES);
         pin_store = fill_with_shuffled_numbers(MAX_PIN);
@@ -152,22 +153,9 @@ public class Core implements GUIAPI {
         new_owner = new BikeOwner(values);
         db.put(new_owner.ssn(), new_owner);
         // Update pin_lookup.
-        List<BikeOwner> same_pin_list = pin_lookup.get(values[0]);
-        if (same_pin_list == null) {
-            same_pin_list = new ArrayList<BikeOwner>();
-            pin_lookup.put(values[0], same_pin_list);
-        }
-        same_pin_list.add(new_owner);
+        pin_lookup.put(values[0], new_owner);
         save();
         return true;
-    }
-
-    public List<BikeOwner> owners_with_pin(String pin) {
-        List<BikeOwner> list = pin_lookup.get(pin);
-        if (list == null) {
-            return new ArrayList<BikeOwner>();
-        }
-        return list;
     }
 
     public boolean editBikeOwner(BikeOwner old_owner, BikeOwner new_owner) {
@@ -235,6 +223,14 @@ public class Core implements GUIAPI {
         List list = new ArrayList<BikeOwner>(db.values());
         Collections.sort(list);
         return list;
+    }
+
+    public BikeOwner userWithPin(String pin) throws IOException {
+      BikeOwner owner_for_pin = pin_lookup.get(pin);
+      if (owner_for_pin == null) {
+        throw new IOException("Could not find owner with pin: "+pin);
+      }
+      return owner_for_pin;
     }
 
     public String pin(String ssn) throws IOException {
