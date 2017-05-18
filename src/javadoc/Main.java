@@ -602,10 +602,20 @@ public class Main extends Application {
         // Add list grid to main grid.
         main_grid.add(list_grid, 0, 0);
 
-        // Add statusbar to main grid.
+        // Create status grid.
         GridPane status_grid = get_grid(Pos.TOP_LEFT);
-        status_grid.add(status_label, 0, 0);
-        status_grid.add(bar_status, 1, 0);
+
+        // Add search bar.
+        OurButton button_search = new OurButton("Search");
+        OurTextField bar_search = new OurTextField(button_search);
+        status_grid.add(bar_search, 0, 0);
+        status_grid.add(button_search, 1, 0);
+
+        // Add status bar.
+        status_grid.add(status_label, 0, 1);
+        status_grid.add(bar_status, 1, 1);
+
+        // Add status_grid to main grid.
         main_grid.add(status_grid, 0, 1);
 
         // Set window style.
