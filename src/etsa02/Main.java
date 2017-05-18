@@ -27,6 +27,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -69,8 +70,8 @@ public class Main extends Application {
     int LOGIN_HEIGHT = 400;
     int LOGIN_WIDTH = 800;
 
-    int MAIN_HEIGHT = 200;
-    int MAIN_WIDTH = 200;
+    int MAIN_HEIGHT = LOGIN_HEIGHT;
+    int MAIN_WIDTH = LOGIN_WIDTH;
 
     TreeItem<ListElement> users;
     TreeView<ListElement> view_root;
@@ -633,6 +634,14 @@ public class Main extends Application {
 
         // Add list grid to main grid.
         main_grid.add(list_grid, 0, 0);
+
+
+        ColumnConstraints column1 = new ColumnConstraints(MAIN_WIDTH/4,MAIN_HEIGHT,Double.MAX_VALUE);
+        column1.setHgrow(Priority.ALWAYS);
+
+        main_grid.getColumnConstraints().add(column1);
+        list_grid.getColumnConstraints().add(column1);
+
 
 
         // Add search bar.
