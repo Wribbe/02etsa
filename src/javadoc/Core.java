@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
+import java.util.NoSuchElementException;
 
 /**
  * Class that holds the core functionality of the Easy Park software stack.
@@ -72,6 +73,8 @@ public class Core implements GUIAPI {
                 // Ignore.
             } catch (NumberFormatException e) {
                 error = "Issued barcodes number in top of database file cannot be parsed.";
+            } catch (NoSuchElementException e) { // Empty database file.
+                // ignore.
             }
         } else {
             try {
