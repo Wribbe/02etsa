@@ -33,6 +33,7 @@ public class Core implements GUIAPI {
 
     private final long BARCODE_SEED = 97234098;
     private final int MAX_BARCODES = 100000;
+    private final int MAX_PIN = 10000;
     private final String DATABASE_PATH = "database.txt";
     private final Charset CHARSET = Charset.forName("UTF-8");
     private final int MAX_PARKED = 100;
@@ -41,23 +42,26 @@ public class Core implements GUIAPI {
     private Map<String,List<BikeOwner>> pin_lookup;
 
     private Random random;
-    private int[] barcode_store = new int[MAX_BARCODES];
+    private int[] barcode_store;
+    private int[] pin_store;
     private Path database_file;
     private String error = null;
     private HWAPI HW;
 
     private int issued_barcodes = 0;
+    private int issued_pins = 0;
     private List<Barcode> parked = new ArrayList<Barcode>();
     private List<BikeOwner> inside = new ArrayList<BikeOwner>();
 
     public Core() {
 
-        SetupBarcodeDatabase();
-
         database_file = Paths.get(DATABASE_PATH);
 
         db = new HashMap<String, BikeOwner>();
         pin_lookup = new HashMap<String, List<BikeOwner>>();
+
+        barcode_store = fill_with_shuffled_numbers(MAX_BARCODES);
+        pin_store = fill_with_shuffled_numbers(MAX_PIN);
 
         if (Files.exists(database_file) && !Files.isDirectory(database_file)) {
             try {
@@ -260,28 +264,27 @@ public class Core implements GUIAPI {
         return users;
     }
 
-    private void SetupBarcodeDatabase() {
+    private int[] fill_with_shuffled_numbers(int size) {
 
-        for (int i=0; i<MAX_BARCODES; i++) {
-            barcode_store[i] = i;
-        }
+      int[] store = new int[size];
 
-        random = new Random(BARCODE_SEED);
+      random = new Random(BARCODE_SEED);
 
-        // Assign all possible barcodes.
-        for (int i=0; i<MAX_BARCODES; i++) {
-            barcode_store[i] = i;
-        }
+      for (int i=0; i<size; i++) {
+        store[i] = i;
+      }
 
-        // Shuffle based on seed.
-        for (int i = MAX_BARCODES-1; i > 0; i--) {
-            // Get any element up to this current point, == don't reshuffle
-            // wherer we've already been.
-            int index = random.nextInt(i+1);
-            int temp = barcode_store[index];
-            barcode_store[index] = barcode_store[i];
-            barcode_store[i] = temp;
-        }
+      for (int i = size-1; i > 0; i--) {
+        // Get any element up to this current point, == don't reshuffle
+        // wherer we've already been.
+        int index = random.nextInt(i+1);
+        int temp = store[index];
+        store[index] = store[i];
+        store[i] = temp;
+      }
+
+      return store;
+
     }
 
     private void save() {
@@ -298,11 +301,7 @@ public class Core implements GUIAPI {
     }
 
     private String getPin() {
-        Random random = new Random(System.currentTimeMillis());
-        StringBuilder strb = new StringBuilder();
-        for (int i=0; i<4; i++) {
-            strb.append(random.nextInt(10));
-        }
-        return strb.toString();
+      System.out.println(pin_store[issued_pins]);
+      return String.format("%04d",pin_store[issued_pins++]);
     }
 }

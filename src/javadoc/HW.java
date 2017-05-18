@@ -71,6 +71,12 @@ public class HW implements HWAPI {
         }
     }
 
+    private void severeError() {
+        Signal errorCommon = new Signal(terminal, RED, 1000, 9);
+        Thread t = new Thread(errorCommon);
+        t.start();
+    }
+
     private void commonError() {
         Signal errorCommon = new Signal(terminal, RED, 1000, 3);
         Thread t = new Thread(errorCommon);
