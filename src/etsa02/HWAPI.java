@@ -1,4 +1,4 @@
-package javadoc;
+package etsa02;
 
 import hardware_interfaces.PincodeObserver;
 import hardware_interfaces.BarcodeObserver;

@@ -1,4 +1,4 @@
-package javadoc;
+package etsa02;
 
 /**
  * Interface to make it possible to nest BikeUsers and Barcodes in graphical

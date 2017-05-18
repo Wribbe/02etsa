@@ -1,4 +1,4 @@
-package javadoc;
+package etsa02;
 
 import java.util.List;
 import java.io.IOException;

@@ -1,2 +1,3 @@
 #!/bin/sh
-javadoc -d javadoc/doc javadoc
+directory=${1}
+javadoc -d doc ${directory}

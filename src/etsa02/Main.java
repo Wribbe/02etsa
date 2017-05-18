@@ -10,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -18,8 +19,11 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TreeView;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeCell;
+import javafx.scene.control.MultipleSelectionModel;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -27,23 +31,37 @@ import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Comparator;
 
-import hardware_testdrivers.BarcodePrinterTestDriver;
+import java.io.IOException;
 
 import java.util.LinkedList;
+
+import hardware_testdrivers.*;
+import hardware_interfaces.*;
 
 public class Main extends Application {
 
     TreeItem global_selected_owner = null;
-    TreeItem global_selected_bike = null;
+    TreeItem global_selected_barcode = null;
 
-    TreeItem<ListElement> users;
+    BarcodePrinter printer;
+    BarcodeScanner scanner_entry;
+    BarcodeScanner scanner_exit;
+    ElectronicLock lock_entry;
+    ElectronicLock lock_exit;
+    PincodeTerminal terminal;
 
-    BikeOwner Agda = new BikeOwner("Agda", "1989-01-01", "Hem Agda", "0701234567", "Agda@email.se");
-    BikeOwner Bosse = new BikeOwner("Bosse", "1997-11-01", "Hem Bosse", "0701234724", "Bosse@email.se");
-    BikeOwner Cissi = new BikeOwner("Cicci", "2003-02-13", "Hem Cicci", "0701235043", "Cicci@email.se");
+    private static GUIAPI api;
+
+    private String[] popup_fields = {"Name", "SSN", "Address", "Phone", "Email"};
+    private String FORMAT_DATE = "DATEFORMAT";
+    private String[] formats_popup = {".*", FORMAT_DATE, ".*", "\\d{9,10}", ".+@.+\\..+"};
+
+    private final int MAX_BARCODES = 2;
 
     int POPUP_HEIGHT = 300;
     int POPUP_WIDTH = 300;
@@ -54,9 +72,13 @@ public class Main extends Application {
     int MAIN_HEIGHT = 200;
     int MAIN_WIDTH = 200;
 
+    TreeItem<ListElement> users;
+    TreeView<ListElement> view_root;
+
 
     public static void main(String args[])
     {
+        api = new Core();
         launch(args);
     }
 
@@ -92,7 +114,9 @@ public class Main extends Application {
         protected GridPane grid;
         protected Text output;
 
-        public PopupBase(String title, Text output) {
+        protected List<OurTextField> fields = new ArrayList<OurTextField>();
+
+        public PopupBase(String title, Text output, String... fields_input) {
 
             this.output = output;
 
@@ -115,39 +139,74 @@ public class Main extends Application {
             ok.setOnAction(action_ok());
             cancel.setOnAction(action_cancel());
 
-            grid.add(cancel, 0, 6);
-            grid.add(ok, 1, 6);
+            grid.add(cancel, 0, fields_input.length);
+            grid.add(ok, 1, fields_input.length);
 
             Scene scene = new Scene(grid, POPUP_WIDTH, POPUP_HEIGHT);
-            Label label_name = new Label("Name");
-            OurTextField field_name = new OurTextField(ok);
-            grid.add(label_name, 0, 0);
-            grid.add(field_name, 1, 0);
 
-            Label label_ssn = new Label("SSN");
-            OurTextField field_ssn = new OurTextField(ok);
-            grid.add(label_ssn, 0, 1);
-            grid.add(field_ssn, 1, 1);
-
-            Label label_address = new Label("Address");
-            OurTextField field_address = new OurTextField(ok);
-            grid.add(label_address, 0, 2);
-            grid.add(field_address, 1, 2);
-
-            Label label_phone = new Label("Phone");
-            OurTextField field_phone = new OurTextField(ok);
-            grid.add(label_phone, 0, 3);
-            grid.add(field_phone, 1, 3);
-
-            Label label_email = new Label("Email");
-            OurTextField field_email = new OurTextField(ok);
-            grid.add(label_email, 0, 4);
-            grid.add(field_email, 1, 4);
+            for (int i=0; i<fields_input.length; i++) {
+                grid.add(new Label(fields_input[i]), 0, i);
+                fields.add(new OurTextField(ok));
+                grid.add(fields.get(fields.size()-1), 1, i);
+            }
 
             dialog.setScene(scene);
-            scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
+            // Focus on first field.
+            fields.get(0).requestFocus();
+            scene.getStylesheets().add(Main.class.getResource("../etsa02/login.css").toExternalForm());
 
         }
+
+        public String[] fieldsAsArray() {
+            List<String> list = new ArrayList<String>();
+            // Pad pin with empty string to make ssn() return correct value.
+            list.add("");
+            for (OurTextField field : fields) {
+                list.add(field.getText().trim());
+            }
+            return list.toArray(new String[list.size()]);
+        }
+
+        public String[] fieldsAsArray(String pin) {
+            List<String> list = new ArrayList<String>();
+            list.add(pin);
+            for (OurTextField field : fields) {
+                list.add(field.getText().trim());
+            }
+            return list.toArray(new String[list.size()]);
+        }
+
+        protected String validate() {
+            int current_index = 0;
+            for (OurTextField field : fields) {
+
+                String field_name = popup_fields[current_index];
+                String field_value = field.getText().trim();
+                String format_string = formats_popup[current_index];
+
+                if (field_value.equals("")) {
+                  return "Please put a value in field \""+field_name+"\".";
+                }
+                if (format_string.equals(FORMAT_DATE)) {
+                  if (!field_value.matches("\\d{12}")) {
+                    return field_name+" needs to be 12 digits.";
+                  }
+                  Integer month = new Integer(field_value.substring(4,6));
+                  Integer day = new Integer(field_value.substring(6,8));
+                  if (month > 12 || month < 1) {
+                    return field_name+" month needs to be between 1-12.";
+                  }
+                  if (day > 31 | day < 1) {
+                    return field_name+" day needs to be between 1-31.";
+                  }
+                } else if(!field_value.matches(format_string)){
+                  return field_name+" has wrong format.";
+                }
+                current_index++;
+            }
+            return "";
+        }
+
 
         public abstract void show();
 
@@ -160,8 +219,8 @@ public class Main extends Application {
     }
 
     private class PopupNewUser extends PopupBase {
-        public PopupNewUser(Text output) {
-            super("New User", output);
+        public PopupNewUser(Text output, String... input_fields) {
+            super("New User", output, input_fields);
         }
         public void show() {
             this.dialog.show();
@@ -172,12 +231,28 @@ public class Main extends Application {
         public String status_cancel() {
             return "User creation aborted.";
         }
+
         public EventHandler<ActionEvent> action_ok() {
             EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
                 public void handle(ActionEvent e) {
-                    output.setText(status_ok());
-                    add_user(Bosse);
-                    dialog.close();
+                    if (validate().equals("")) {
+                        output.setText(status_ok());
+                        api.newBikeOwner(fieldsAsArray());
+                        TreeItem<ListElement> item;
+                        BikeOwner guiOwner = new BikeOwner(fieldsAsArray());
+                        try {
+                            String pin = api.pin(guiOwner.ssn());
+                            api.setPin(guiOwner, pin);
+                        } catch (IOException ioe) {
+                            api.setPin(guiOwner, "");
+                        }
+                        item = new TreeItem<ListElement>(guiOwner, null);
+                        users.getChildren().add(item);
+                        users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
+                        dialog.close();
+                    } else {
+                        output.setText(validate());
+                    }
                 }
             };
             return handler;
@@ -193,8 +268,57 @@ public class Main extends Application {
         }
     }
 
-    public void add_user(BikeOwner user) {
-        users.getChildren().add(new TreeItem<ListElement>(user));
+    private class PopupEditUser extends PopupBase {
+
+        TreeItem<ListElement> owner;
+
+        public PopupEditUser(Text output, TreeItem<ListElement> owner) {
+            super("Edit User", output, popup_fields);
+            this.owner = owner;
+            String[] fields_owner = ((BikeOwner) owner.getValue()).getFields();
+            for (int i=0; i<fields.size(); i++) {
+                this.fields.get(i).setText(fields_owner[i+1]);
+            }
+        }
+        public void show() {
+            this.dialog.show();
+        }
+        public String status_ok() {
+            return "User edited successfully.";
+        }
+        public String status_cancel() {
+            return "User edit aborted.";
+        }
+
+        public EventHandler<ActionEvent> action_ok() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    if (validate().equals("")) {
+                        output.setText(status_ok());
+                        BikeOwner bike_owner = (BikeOwner) owner.getValue();
+                        BikeOwner updated = new BikeOwner(fieldsAsArray(bike_owner.pin()));
+                        // Update database before updating GUI object.
+                        api.editBikeOwner(bike_owner, updated);
+                        // Update GUI object.
+                        bike_owner.update(updated);
+                        users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
+                        dialog.close();
+                    } else {
+                        output.setText(validate());
+                    }
+                }
+            };
+            return handler;
+        }
+        public EventHandler<ActionEvent> action_cancel() {
+            EventHandler<ActionEvent> handler = new EventHandler<ActionEvent>() {
+                public void handle(ActionEvent e) {
+                    output.setText(status_cancel());
+                    dialog.close();
+                }
+            };
+            return handler;
+        }
     }
 
     public void popup_handler(ActionEvent e, PopupBase popup) {
@@ -203,7 +327,7 @@ public class Main extends Application {
 
     public void set_style(Scene scene)
     {
-        String resource = Main.class.getResource("login.css").toExternalForm();
+        String resource = Main.class.getResource("../etsa02/login.css").toExternalForm();
         scene.getStylesheets().add(resource);
     }
 
@@ -211,7 +335,7 @@ public class Main extends Application {
 
         GridPane grid = get_grid();
 
-        Text scenetitle = new Text("Welcome");
+        Text scenetitle = new Text("EasyPark");
         scenetitle.setId("welcome-text");
 
         OurButton signIn = new OurButton("Sign in");
@@ -240,8 +364,8 @@ public class Main extends Application {
         grid.add(actiontarget, 1, 6);
         actiontarget.setId("actiontarget");
 
-        String str_user = "a";
-        String str_password = "a";
+        String str_user = "Admin";
+        String str_password = "password";
 
         signIn.setOnAction(new EventHandler<ActionEvent>() {
 
@@ -260,83 +384,56 @@ public class Main extends Application {
         });
 
         set_style(login_scene);
+        userTextField.requestFocus();
 
         return login_scene;
     }
 
-    private interface ListElement {
-      public String toString();
+    private void handleMouseClicked(MouseEvent event) {
+        Node node = event.getPickResult().getIntersectedNode();
+        // Accept clicks only on node cells, and not on empty spaces of the TreeView
+        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)) {
+            TreeItem<ListElement> item = (TreeItem)view_root.getSelectionModel().getSelectedItem();
+            ListElement element = item.getValue();
+            if (element instanceof BikeOwner) {
+                global_selected_owner = item;
+                global_selected_barcode = null;
+            } else if (element instanceof Barcode) {
+                global_selected_owner = null;
+                global_selected_barcode = item;
+            } else {
+                global_selected_owner = null;
+                global_selected_barcode = null;
+                System.out.println("Don't know what you clicked.");
+            }
+        }
     }
 
-    private class Bike implements ListElement {
+    private class BarcodeWrapper extends Barcode {
 
-      private String barcode;
-      private String make;
-      private String color;
-      private String type;
+      public int number = 0;
+      private Barcode barcode;
 
-      public Bike(String barcode) {
+      public BarcodeWrapper(String string, int number) {
+        super(string);
+        this.number = number;
+      }
+
+      public BarcodeWrapper(Integer integer, int number) {
+        super(integer);
+        this.number = number;
+      }
+
+      public BarcodeWrapper(Barcode barcode, int number) {
+        super(barcode.toString());
+        this.number = number;
         this.barcode = barcode;
       }
 
-      public void set_make(String make) {
-        this.make = make;
-      }
-
-      public void set_color(String color) {
-        this.color = color;
-      }
-
-      public void set_type(String type) {
-        this.type = type;
-      }
-
-      public String barcode() {
-        return this.barcode;
-      }
-
-      public boolean equals(Bike other) {
-        return other.barcode().equals(this.barcode);
-      }
-
       public String toString() {
-        return this.barcode;
-      }
-    }
-
-    private class BikeOwner implements ListElement {
-
-      private String name = "";
-      private String ssn;
-      private String address;
-      private String phone;
-      private String email;
-      private List<Bike> bikes;
-
-      public BikeOwner(String name,
-                      String ssn,
-                      String address,
-                      String phone,
-                      String email) {
-        this.name = name;
-        this.ssn = ssn;
-        this.address = address;
-        this.phone = phone;
-        this.email = email;
-        bikes = new LinkedList<Bike>();
+        return "Bike "+number+": "+super.toString();
       }
 
-      public String toString() {
-        return this.name;
-      }
-
-      public boolean addBike(Bike bike) {
-        return bikes.add(bike);
-      }
-
-      public boolean removeBike(Bike bike) {
-        return bikes.remove(bike);
-      }
     }
 
     public Scene setup_main_scene(Stage stage_main) {
@@ -347,92 +444,158 @@ public class Main extends Application {
 
         Scene main_scene = new Scene(main_grid, MAIN_WIDTH, MAIN_HEIGHT);
 
-        TreeItem<ListElement> TreeItemAgda = new TreeItem<ListElement>(Agda, null);
-
-        // Set up main rootItem.
-        users = new TreeItem<ListElement>(Agda, null);
-        TreeView<ListElement> view_root = new TreeView<ListElement>();
-
-        view_root.setRoot(users);
+        view_root = new TreeView<ListElement>();
         view_root.setShowRoot(false);
 
-        for (int i=0; i<100; i++) {
-          TreeItem<ListElement> item = new TreeItem<ListElement>(Agda, null);
-          for (int j=0; j<20; j++) {
-            TreeItem<ListElement> bike = new TreeItem<ListElement>(new Bike("Test"));
-            item.getChildren().add(bike);
-          }
-          users.getChildren().add(item);
-        }
-        list_grid.add(view_root, 0, 0);
+        EventHandler<MouseEvent> mouseEventHandle = (MouseEvent event) -> {
+            handleMouseClicked(event);
+        };
 
-        // Set listener.
-        view_root.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<TreeItem<ListElement>>() {
+        view_root.addEventHandler(MouseEvent.MOUSE_CLICKED, mouseEventHandle);
+
+
+        ChangeListener users_listener = new ChangeListener<TreeItem<ListElement>>() {
             public void changed(ObservableValue<? extends TreeItem<ListElement>> observable,
                                 TreeItem<ListElement> value_old, TreeItem<ListElement> value_new) {
 
-                ListElement element = value_new.getValue();
-
-                if (element instanceof BikeOwner) {
-                    global_selected_owner = value_new;
-                    global_selected_bike = null;
-                } else if (element instanceof Bike) {
-                    global_selected_owner = null;
-                    global_selected_bike = value_new;
-                } else {
-                    global_selected_owner = null;
-                    global_selected_bike = null;
-                    System.out.println("Don't know what you clicked.");
+                if(value_new != null) {
+                    ListElement element = value_new.getValue();
+                    if (element instanceof BikeOwner) {
+                        global_selected_owner = value_new;
+                        global_selected_barcode = null;
+                    } else if (element instanceof Barcode) {
+                        global_selected_owner = null;
+                        global_selected_barcode = value_new;
+                    } else {
+                        global_selected_owner = null;
+                        global_selected_barcode = null;
+                        System.out.println("Don't know what you clicked.");
+                    }
                 }
             }
-        });
+        };
+
+        view_root.getSelectionModel().selectedItemProperty().addListener(users_listener);
+
+        list_grid.add(view_root, 0, 0);
+
+        users = new TreeItem<ListElement>();
+
+        for (BikeOwner owner : api.listUsers()) {
+            TreeItem<ListElement> item = new TreeItem<ListElement>(owner, null);
+            int current_index = 1;
+            for (Barcode barcode : owner.getBarcodes()) {
+                BarcodeWrapper wrapper = new BarcodeWrapper(barcode, current_index);
+                item.getChildren().add(new TreeItem<ListElement>(wrapper, null));
+                current_index++;
+            }
+            users.getChildren().add(item);
+        }
+        users.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
+
+        view_root.setRoot(users);
 
         // Create statusbar and label.
         Label status_label = new Label("Status:");
-        Text status_bar = new Text();
+        Text bar_status = new Text();
 
         // Set buttons.
         OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
-        PopupBase new_user = new PopupNewUser(status_bar);
-        button_new_user.setOnAction(e-> popup_handler(e, new_user));
+        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(bar_status, popup_fields)));
 
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
+        button_edit_user.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                if (global_selected_owner == null) {
+                    bar_status.setText("Error: Please select a user.");
+                    return;
+                }
+                popup_handler(e, new PopupEditUser(bar_status, global_selected_owner));
+            }
+        });
 
         OurButton button_remove_user = new OurButton("Remove user");
         button_grid.add(button_remove_user, 1, 2);
         button_remove_user.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_owner == null) {
-                    status_bar.setText("Error: Please select a user.");
+                    bar_status.setText("Error: Please select a user.");
                     return;
                 }
-                // Remove the tree item.
-                String removed_name = global_selected_owner.getValue().toString();
+                // Remove from database.
+                BikeOwner to_be_removed = (BikeOwner) global_selected_owner.getValue();
+                api.removeBikeOwner(to_be_removed);
+
+                // Remove from gui.
                 global_selected_owner.getParent().getChildren().remove(global_selected_owner);
                 global_selected_owner = null;
-                status_bar.setText("Successfully removed: "+removed_name+".");
             }
         });
 
-        OurButton button_add_bike = new OurButton("Add bike");
-        button_grid.add(button_add_bike, 1, 3);
-        button_add_bike.setOnAction(new EventHandler<ActionEvent>() {
+        OurButton button_add_barcode = new OurButton("Add barcode");
+        button_grid.add(button_add_barcode, 1, 3);
+        button_add_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_owner == null) {
-                    status_bar.setText("Error: Please select a user.");
+                    bar_status.setText("Error: Please select a user.");
                     return;
                 }
-                // Add bike to user.
+                if (global_selected_owner.getChildren().size() >= MAX_BARCODES) {
+                    bar_status.setText("Maximum number of bikes registered.");
+                    return;
+                }
+
+                TreeItem<ListElement> owner = global_selected_owner;
+                Barcode new_code = api.newBarcode();
+                int left = api.barcodesLeft();
+                if (left > 0) {
+                    api.addBarcode((BikeOwner) owner.getValue(), new_code);
+                    int num_bikes = owner.getChildren().size()+1;
+                    BarcodeWrapper wrapper = new BarcodeWrapper(new_code, num_bikes);
+                    owner.getChildren().add(new TreeItem<ListElement>(wrapper, null));
+                    //owner.getChildren().sort(Comparator.comparing(t->t.toString().toLowerCase()));
+                }
+                left = api.barcodesLeft();
+                if (left == 0) {
+                    bar_status.setText("Warning, no barcodes left!");
+                } else if (left < 100) {
+                    bar_status.setText("Warning, only: "+left+" barcodes left!");
+                } else {
+                    bar_status.setText(left+" barcodes left.");
+                }
+                return;
             }
         });
 
-        OurButton button_remove_bike = new OurButton("Remove bike");
-        button_grid.add(button_remove_bike, 1, 4);
-        button_remove_bike.setOnAction(new EventHandler<ActionEvent>() {
+        OurButton button_remove_barcode = new OurButton("Remove barcode");
+        button_grid.add(button_remove_barcode, 1, 4);
+        button_remove_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                System.out.println("REMOVE BIKE!");
+                if (global_selected_barcode == null) {
+                    bar_status.setText("Error: Please select a barcode.");
+                    return;
+                }
+                // Remove from core.
+                Barcode to_be_removed = (Barcode) global_selected_barcode.getValue();
+                BikeOwner owner = (BikeOwner) global_selected_barcode.getParent().getValue();
+                api.removeBarcode(owner, to_be_removed);
+
+                // Remove from gui.
+                List<TreeItem<ListElement>> children = global_selected_barcode.getParent().getChildren();
+                children.remove(global_selected_barcode);
+                global_selected_barcode = null;
+
+                // Update wrapper numbers.
+                int current_index = 1;
+                for (TreeItem<ListElement> child : children) {
+                  BarcodeWrapper wrapper = (BarcodeWrapper)child.getValue();
+                  wrapper.number = current_index;
+                  current_index++;
+                }
+
+                bar_status.setText("Successfully removed: "+to_be_removed.toString());
             }
         });
 
@@ -440,7 +603,31 @@ public class Main extends Application {
         button_grid.add(button_print_barcode, 1, 5);
         button_print_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
-                System.out.println("PRINT BARCODE!");
+                if (global_selected_barcode == null) {
+                    bar_status.setText("Error: Please select a barcode.");
+                    return;
+                }
+                if (printer == null) {
+
+                    printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
+                    scanner_entry = new BarcodeScannerTestDriver("Barcode Entry Scanner", 10, 20);
+                    scanner_exit = new BarcodeScannerTestDriver("Barcode Exit Scanner", 10, 30);
+                    lock_entry = new ElectronicLockTestDriver("Electronic Entry Lock", 10, 40);
+                    lock_exit = new ElectronicLockTestDriver("Electronic Exit Lock", 10, 50);
+                    terminal = new PincodeTerminalTestDriver("Pincode Terminal", 10, 60);
+
+                    boolean ENTRY = true;
+
+                    PincodeTerminal output_entry = terminal;
+                    PincodeTerminal output_exit = null;
+
+                    api.HW().register_and_link(scanner_entry, lock_entry, ENTRY, output_entry);
+                    api.HW().register_and_link(terminal, lock_entry);
+
+                    api.HW().register_and_link(scanner_exit, lock_exit, !ENTRY, output_exit);
+
+                }
+                printer.printBarcode(((Barcode)global_selected_barcode.getValue()).serial());
             }
         });
 
@@ -450,11 +637,46 @@ public class Main extends Application {
         // Add list grid to main grid.
         main_grid.add(list_grid, 0, 0);
 
-        // Add statusbar to main grid.
+
+        // Add search bar.
+        GridPane search_grid = get_grid(Pos.TOP_LEFT);
+        OurButton button_search = new OurButton("Search");
+        OurTextField input_search = new OurTextField(button_search);
+        search_grid.add(input_search, 0, 0);
+        search_grid.add(button_search, 1, 0);
+        main_grid.add(search_grid, 0, 1);
+
+        // Setup search button.
+        button_search.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                String ssn_to_find = input_search.getText().trim();
+                if (ssn_to_find.equals("")) {
+                    bar_status.setText("Please enter a SSN to search for.");
+                    return;
+                }
+                List<TreeItem<ListElement>> user_list = users.getChildren();
+                for (TreeItem<ListElement> user : user_list) {
+                    BikeOwner owner = (BikeOwner) user.getValue();
+                    if (owner.ssn().equals(ssn_to_find)) {
+                        MultipleSelectionModel model = view_root.getSelectionModel();
+                        int row = view_root.getRow(user);
+                        model.select(row);
+                        return;
+                    }
+                }
+                bar_status.setText("Nothing found for: "+ssn_to_find);
+            }
+        });
+
+        // Create status grid.
         GridPane status_grid = get_grid(Pos.TOP_LEFT);
+
+        // Add status bar.
         status_grid.add(status_label, 0, 0);
-        status_grid.add(status_bar, 1, 0);
-        main_grid.add(status_grid, 0, 1);
+        status_grid.add(bar_status, 1, 0, 2, 1);
+
+        // Add status_grid to main grid.
+        main_grid.add(status_grid, 0, 2, 2, 1);
 
         // Set window style.
         set_style(main_scene);
@@ -479,9 +701,6 @@ public class Main extends Application {
 
     public void start(Stage primaryStage)
     {
-    	BarcodePrinterTestDriver printer = new BarcodePrinterTestDriver("mupp", 10, 10);
-
-    	printer.printBarcode("12345");
         stage_main = primaryStage;
         stage_main.setWidth(LOGIN_WIDTH);
         stage_main.setHeight(LOGIN_HEIGHT);
@@ -489,12 +708,13 @@ public class Main extends Application {
         stage_main.setMinHeight(LOGIN_HEIGHT);
         stage_main.setResizable(false);
 
-        stage_main.setTitle("JavaFX Welcome");
+        stage_main.setTitle("EasyPark -- Ultimate garage maintainer.");
 
         login_scene = setup_login_scene(stage_main);
         main_scene = setup_main_scene(stage_main);
 
         stage_main.setScene(login_scene);
         stage_main.show();
+
     }
 }
