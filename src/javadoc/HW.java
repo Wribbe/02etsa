@@ -66,7 +66,8 @@ public class HW implements HWAPI {
             currentQueue = new StringBuilder();
 
             try {
-              core.userWithPin(current_pin);
+              BikeOwner owner = core.userWithPin(current_pin);
+              core.enter(owner);
             } catch (IOException e) {
               commonError();
             }
