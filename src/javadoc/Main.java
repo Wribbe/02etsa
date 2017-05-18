@@ -146,6 +146,8 @@ public class Main extends Application {
             }
 
             dialog.setScene(scene);
+            // Focus on first field.
+            fields.get(0).requestFocus();
             scene.getStylesheets().add(Main.class.getResource("../etsa02/login.css").toExternalForm());
 
         }
