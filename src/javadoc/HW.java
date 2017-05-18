@@ -66,10 +66,10 @@ public class HW implements HWAPI {
             currentQueue = new StringBuilder();
 
             try {
-              BikeOwner owner = core.userWithPin(current_pin);
-              core.enter(owner);
+                BikeOwner owner = core.userWithPin(current_pin);
+                core.enter(owner);
             } catch (IOException e) {
-              commonError();
+                commonError();
             }
 
             Ok();
@@ -77,8 +77,8 @@ public class HW implements HWAPI {
 
         } else if (c == '*') {
 
-          // Reset input.
-          currentQueue = new StringBuilder();
+            // Reset input.
+            currentQueue = new StringBuilder();
 
         } else {
             currentQueue.append(c);
@@ -104,7 +104,7 @@ public class HW implements HWAPI {
     }
 
     private void Unlock() {
-      this.lock.open(20);
+        this.lock.open(20);
     }
 
     private class Signal implements Runnable {
