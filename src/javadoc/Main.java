@@ -479,22 +479,22 @@ public class Main extends Application {
 
         // Create statusbar and label.
         Label status_label = new Label("Status:");
-        Text status_bar = new Text();
+        Text bar_status = new Text();
 
         // Set buttons.
         OurButton button_new_user = new OurButton("New user");
         button_grid.add(button_new_user, 1, 0);
-        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(status_bar, popup_fields)));
+        button_new_user.setOnAction(e-> popup_handler(e,new PopupNewUser(bar_status, popup_fields)));
 
         OurButton button_edit_user = new OurButton("Edit user");
         button_grid.add(button_edit_user, 1, 1);
         button_edit_user.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_owner == null) {
-                    status_bar.setText("Error: Please select a user.");
+                    bar_status.setText("Error: Please select a user.");
                     return;
                 }
-                popup_handler(e, new PopupEditUser(status_bar, global_selected_owner));
+                popup_handler(e, new PopupEditUser(bar_status, global_selected_owner));
             }
         });
 
@@ -503,7 +503,7 @@ public class Main extends Application {
         button_remove_user.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_owner == null) {
-                    status_bar.setText("Error: Please select a user.");
+                    bar_status.setText("Error: Please select a user.");
                     return;
                 }
                 // Remove from database.
@@ -521,11 +521,11 @@ public class Main extends Application {
         button_add_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_owner == null) {
-                    status_bar.setText("Error: Please select a user.");
+                    bar_status.setText("Error: Please select a user.");
                     return;
                 }
                 if (global_selected_owner.getChildren().size() >= MAX_BARCODES) {
-                    status_bar.setText("Maximum number of bikes registered.");
+                    bar_status.setText("Maximum number of bikes registered.");
                     return;
                 }
 
@@ -541,11 +541,11 @@ public class Main extends Application {
                 }
                 left = api.barcodesLeft();
                 if (left == 0) {
-                    status_bar.setText("Warning, no barcodes left!");
+                    bar_status.setText("Warning, no barcodes left!");
                 } else if (left < 100) {
-                    status_bar.setText("Warning, only: "+left+" barcodes left!");
+                    bar_status.setText("Warning, only: "+left+" barcodes left!");
                 } else {
-                    status_bar.setText(left+" barcodes left.");
+                    bar_status.setText(left+" barcodes left.");
                 }
                 return;
             }
@@ -556,7 +556,7 @@ public class Main extends Application {
         button_remove_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_barcode == null) {
-                    status_bar.setText("Error: Please select a barcode.");
+                    bar_status.setText("Error: Please select a barcode.");
                     return;
                 }
                 // Remove from core.
@@ -577,7 +577,7 @@ public class Main extends Application {
                   current_index++;
                 }
 
-                status_bar.setText("Successfully removed: "+to_be_removed.toString());
+                bar_status.setText("Successfully removed: "+to_be_removed.toString());
             }
         });
 
@@ -586,7 +586,7 @@ public class Main extends Application {
         button_print_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
                 if (global_selected_barcode == null) {
-                    status_bar.setText("Error: Please select a barcode.");
+                    bar_status.setText("Error: Please select a barcode.");
                     return;
                 }
                 if (printer == null) {
@@ -605,7 +605,7 @@ public class Main extends Application {
         // Add statusbar to main grid.
         GridPane status_grid = get_grid(Pos.TOP_LEFT);
         status_grid.add(status_label, 0, 0);
-        status_grid.add(status_bar, 1, 0);
+        status_grid.add(bar_status, 1, 0);
         main_grid.add(status_grid, 0, 1);
 
         // Set window style.
