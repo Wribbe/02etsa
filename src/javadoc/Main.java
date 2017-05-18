@@ -602,21 +602,31 @@ public class Main extends Application {
         // Add list grid to main grid.
         main_grid.add(list_grid, 0, 0);
 
+
+        // Add search bar.
+        GridPane search_grid = get_grid(Pos.TOP_LEFT);
+        OurButton button_search = new OurButton("Search");
+        OurTextField bar_search = new OurTextField(button_search);
+        search_grid.add(bar_search, 0, 0);
+        search_grid.add(button_search, 1, 0);
+        main_grid.add(search_grid, 0, 1);
+
+        // Setup search button.
+        button_search.setOnAction(new EventHandler<ActionEvent>() {
+            public void handle(ActionEvent e) {
+                bar_status.setText("Search");
+            }
+        });
+
         // Create status grid.
         GridPane status_grid = get_grid(Pos.TOP_LEFT);
 
-        // Add search bar.
-        OurButton button_search = new OurButton("Search");
-        OurTextField bar_search = new OurTextField(button_search);
-        status_grid.add(bar_search, 0, 0);
-        status_grid.add(button_search, 1, 0);
-
         // Add status bar.
-        status_grid.add(status_label, 0, 1);
-        status_grid.add(bar_status, 1, 1);
+        status_grid.add(status_label, 0, 0);
+        status_grid.add(bar_status, 1, 0, 2, 1);
 
         // Add status_grid to main grid.
-        main_grid.add(status_grid, 0, 1);
+        main_grid.add(status_grid, 0, 2);
 
         // Set window style.
         set_style(main_scene);
