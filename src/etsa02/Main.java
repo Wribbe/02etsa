@@ -552,7 +552,7 @@ public class Main extends Application {
             }
         });
 
-        OurButton button_add_barcode = new OurButton("Add barcode");
+        OurButton button_add_barcode = new OurButton("Add bike");
         button_grid.add(button_add_barcode, 1, 3);
         button_add_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
@@ -587,7 +587,7 @@ public class Main extends Application {
             }
         });
 
-        OurButton button_remove_barcode = new OurButton("Remove barcode");
+        OurButton button_remove_barcode = new OurButton("Remove bike");
         button_grid.add(button_remove_barcode, 1, 4);
         button_remove_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
