@@ -41,18 +41,19 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import hardware_testdrivers.*;
+import hardware_interfaces.*;
 
 public class Main extends Application {
 
     TreeItem global_selected_owner = null;
     TreeItem global_selected_barcode = null;
 
-    BarcodePrinterTestDriver printer;
-    BarcodeScannerTestDriver scanner_entry;
-    BarcodeScannerTestDriver scanner_exit;
-    ElectronicLockTestDriver lock_entry;
-    ElectronicLockTestDriver lock_exit;
-    PincodeTerminalTestDriver terminal;
+    BarcodePrinter printer;
+    BarcodeScanner scanner_entry;
+    BarcodeScanner scanner_exit;
+    ElectronicLock lock_entry;
+    ElectronicLock lock_exit;
+    PincodeTerminal terminal;
 
     private static GUIAPI api;
 
@@ -616,10 +617,12 @@ public class Main extends Application {
                     lock_exit = new ElectronicLockTestDriver("Electronic Exit Lock", 10, 50);
                     terminal = new PincodeTerminalTestDriver("Pincode Terminal", 10, 60);
 
-                    api.HW().register_and_link(scanner_entry, lock_entry);
+                    boolean ENTRY = true;
+
+                    api.HW().register_and_link(scanner_entry, lock_entry, ENTRY);
                     api.HW().register_and_link(terminal, lock_entry);
 
-                    api.HW().register_and_link(scanner_exit, lock_exit);
+                    api.HW().register_and_link(scanner_exit, lock_exit, !ENTRY);
 
                 }
                 printer.printBarcode(((Barcode)global_selected_barcode.getValue()).serial());

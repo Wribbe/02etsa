@@ -16,12 +16,8 @@ public class HW implements HWAPI {
 
     private Core core;
 
-    private int RED = PincodeTerminal.RED_LED;
-    private int GREEN = PincodeTerminal.GREEN_LED;
-
     private long lastTimePushed;
 
-    private StringBuilder currentQueue = new StringBuilder();
     private Signal running_signal = null;
 
     public HW(Core core) {
@@ -31,43 +27,23 @@ public class HW implements HWAPI {
 
     private List<Warden> wardens = new ArrayList<Warden>();
 
-    private class Warden implements PincodeObserver, BarcodeObserver {
+    private interface Validator {
+        public boolean validate();
+    }
 
-        public Warden(PincodeTerminal terminal, ElectronicLock lock) {
-            terminal.registerObserver(this);
-        }
+    private class PincodeValidator implements Validator, PincodeObserver {
 
-        public Warden(BarcodeScanner scanner, ElectronicLock lock) {
-            scanner.registerObserver(this);
-        }
+        private StringBuilder currentQueue = new StringBuilder();
 
         public void handleCharacter(char c) {
-            System.out.println(c);
+            if (c == '*') {
+                currentQueue = new StringBuilder();
+            } else {
+                currentQueue.append(c);
+            }
         }
 
-        public void handleBarcode(String barcode) {
-            System.out.println(barcode);
-        }
-
-    }
-
-    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock) {
-        wardens.add(new Warden(scanner, lock));
-    }
-
-    public void register_and_link(PincodeTerminal terminal, ElectronicLock lock) {
-        wardens.add(new Warden(terminal, lock));
-    }
-
-    public void handleCharacter(char c) {
-
-        long currentTime = System.currentTimeMillis();
-        long delay = currentTime - lastTimePushed;
-
-        lastTimePushed = currentTime;
-
-        if (c == '#') {
-
+        public boolean validate() {
             int stop = currentQueue.length();
             int start = stop-4;
 
@@ -82,55 +58,98 @@ public class HW implements HWAPI {
                 BikeOwner owner = core.userWithPin(current_pin);
                 core.enter(owner);
             } catch (IOException e) {
-                commonError();
+                return false;
             }
-
-            Ok();
-            Unlock();
-
-        } else if (c == '*') {
-
-            // Reset input.
-            currentQueue = new StringBuilder();
-
-        } else {
-            currentQueue.append(c);
+            return true;
         }
     }
 
-    PincodeTerminal terminal;
-    ElectronicLock lock;
+    private class ScannerValidator implements Validator, BarcodeObserver {
 
-    private void Ok() {
-        Signal ok = new Signal(terminal, GREEN, 20*1000, 0, 1);
-        Thread t = new Thread(ok);
-        t.start();
+        public ScannerValidator(boolean entry) {
+
+        }
+
+        public boolean validate() {
+            return true;
+        }
+
+        public void handleBarcode(String barcode) {
+
+        }
     }
 
-    private void severeError() {
-        Signal errorCommon = new Signal(terminal, RED, 1000, 1000, 9);
-        Thread t = new Thread(errorCommon);
-        t.start();
+    private class Warden implements BarcodeObserver, PincodeObserver {
+
+        private ElectronicLock lock;
+        private PincodeTerminal terminal;
+        private BarcodeScanner scanner;
+
+        private Signal SIG_OK;
+        private Signal SIG_ERR_NORMAL;
+        private Signal SIG_ERR_BLOCKED;
+
+        private int RED = PincodeTerminal.RED_LED;
+        private int GREEN = PincodeTerminal.GREEN_LED;
+
+        private Validator validator;
+
+        public Warden(PincodeTerminal terminal, ElectronicLock lock) {
+            validator = new PincodeValidator();
+            terminal.registerObserver(this);
+            this.terminal = terminal;
+            this.lock = lock;
+
+            SIG_OK = new Signal(terminal, GREEN, 20*1000, 0, 1);
+            SIG_ERR_NORMAL = new Signal(terminal, RED, 1000, 1000, 3);
+            SIG_ERR_BLOCKED = new Signal(terminal, RED, 1000, 1000, 9);
+
+            SIG_OK.prioritized = true;
+        }
+
+        public Warden(BarcodeScanner scanner, ElectronicLock lock, boolean entry) {
+            validator = new ScannerValidator(entry);
+            scanner.registerObserver(this);
+            this.scanner = scanner;
+            this.lock = lock;
+        }
+
+        public void handleBarcode(String barcode) {
+
+        }
+
+        public void handleCharacter(char c) {
+            if (c == '#') {
+                if (validator.validate()) {
+                    lock.open(20);
+                    SIG_OK.start();
+                } else {
+                    SIG_ERR_NORMAL.start();
+                }
+            } else {
+                ((PincodeObserver)validator).handleCharacter(c);
+            }
+        }
+
     }
 
-    private void commonError() {
-        Signal errorCommon = new Signal(terminal, RED, 1000, 1000, 3);
-        Thread t = new Thread(errorCommon);
-        t.start();
+    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock, boolean entry) {
+        wardens.add(new Warden(scanner, lock, entry));
     }
 
-    private void Unlock() {
-        this.lock.open(20);
+    public void register_and_link(PincodeTerminal terminal, ElectronicLock lock) {
+        wardens.add(new Warden(terminal, lock));
     }
+
+    private Thread thread = null;
 
     private class Signal implements Runnable {
 
         private PincodeTerminal terminal;
         private long delay;
-        private int color;
-        private int flashes = 0;
-        private int done = 0;
-        private int duration = 0;
+        private int color, flashes, done, duration;
+
+        protected boolean prioritized = false;
 
         public Signal(PincodeTerminal terminal, int color, int duration, long delay, int flashes) {
             this.terminal = terminal;
@@ -140,12 +159,21 @@ public class HW implements HWAPI {
             this.duration = duration;
         }
 
-        public void run() {
-            if (running_signal != null) {
-                return;
+        public void start() {
+            if (thread == null || !thread.isAlive()) {
+                thread = new Thread(this);
+                thread.start();
             } else {
-                running_signal = this;
+                if (prioritized) {
+                    thread.interrupt();
+                    thread = new Thread(this);
+                    thread.start();
+                }
             }
+        }
+
+        public void run() {
+            done = 0;
             try {
                 while (done < flashes) {
                     terminal.lightLED(color, duration/1000);
@@ -154,8 +182,6 @@ public class HW implements HWAPI {
                 }
             } catch (InterruptedException e) {
                 return;
-            } finally {
-                running_signal = null;
             }
         }
     }

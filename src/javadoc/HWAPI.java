@@ -18,7 +18,8 @@ import hardware_interfaces.PincodeTerminal;
  * */
 public interface HWAPI {
 
-    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock);
+    public void register_and_link(BarcodeScanner scanner, ElectronicLock lock, boolean entry);
 
     public void register_and_link(PincodeTerminal terminal, ElectronicLock lock);
+
 }
