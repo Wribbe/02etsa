@@ -72,6 +72,7 @@ public class HW implements HWAPI {
             }
 
             Ok();
+            Unlock();
 
         } else if (c == '*') {
 
@@ -99,6 +100,10 @@ public class HW implements HWAPI {
         Signal errorCommon = new Signal(terminal, RED, 1000, 1000, 3);
         Thread t = new Thread(errorCommon);
         t.start();
+    }
+
+    private void Unlock() {
+      this.lock.open(20);
     }
 
     private class Signal implements Runnable {
