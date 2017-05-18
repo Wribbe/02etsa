@@ -335,7 +335,7 @@ public class Main extends Application {
 
         GridPane grid = get_grid();
 
-        Text scenetitle = new Text("Welcome");
+        Text scenetitle = new Text("EasyPark");
         scenetitle.setId("welcome-text");
 
         OurButton signIn = new OurButton("Sign in");
@@ -364,7 +364,7 @@ public class Main extends Application {
         grid.add(actiontarget, 1, 6);
         actiontarget.setId("actiontarget");
 
-        String str_user = "admin";
+        String str_user = "Admin";
         String str_password = "password";
 
         signIn.setOnAction(new EventHandler<ActionEvent>() {
@@ -373,8 +373,7 @@ public class Main extends Application {
                 String inp_user = userTextField.getText();
                 String inp_password= passwordBox.getText();
 
-                //if (!inp_user.equals(str_user) || !inp_password.equals(str_password)) {
-                if (false) {
+                if (!inp_user.equals(str_user) || !inp_password.equals(str_password)) {
                     actiontarget.setText("Wrong password/user.");
                 } else {
                     actiontarget.setText("Welcome "+ inp_user + ".");
@@ -709,7 +708,7 @@ public class Main extends Application {
         stage_main.setMinHeight(LOGIN_HEIGHT);
         stage_main.setResizable(false);
 
-        stage_main.setTitle("JavaFX Welcome");
+        stage_main.setTitle("EasyPark -- Ultimate garage maintainer.");
 
         login_scene = setup_login_scene(stage_main);
         main_scene = setup_main_scene(stage_main);
