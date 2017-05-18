@@ -36,6 +36,10 @@ public class Barcode implements ListElement {
         return serial;
     }
 
+    public String serial() {
+        return serial;
+    }
+
     @Override
     public boolean equals(Object o) {
         ListElement barcode = (ListElement) o;
