@@ -1,5 +1,12 @@
 package javadoc;
 
+import hardware_interfaces.PincodeObserver;
+import hardware_interfaces.BarcodeObserver;
+import hardware_interfaces.BarcodePrinter;
+import hardware_interfaces.BarcodeScanner;
+import hardware_interfaces.ElectronicLock;
+import hardware_interfaces.PincodeTerminal;
+
 /**
  * @author AUTHOR-TAG
  * @version 0.9
@@ -9,38 +16,9 @@ package javadoc;
 /**
  * Interface for handling which methods are available for current hardware peripherals.
  * */
-public interface HWAPI {
+public interface HWAPI extends PincodeObserver, BarcodeObserver {
 
-    /**
-     * Handle received barcode from scanner.
-     * @param string String value returned from scanner.
-     * @return boolean signaling barcode processed successfully.
-     * */
-    public boolean handleBarcode(String string);
+    public void addLock(ElectronicLock lock);
 
-    /**
-     * Handle received character from keypad.
-     * @param c returned character from keypad.
-     * */
-    public void handleCharacter(char c);
-
-    /**
-     * Open electronic lock.
-     * @param lock the lock that should be opened.
-     * @param duration the amount of seconds the lock should be opened.
-     * */
-    public void open(ElectronicLock lock, int duration);
-
-    /**
-     * Light LED on keypad with given color for given duration.
-     * @param color int representing LED color.
-     * @param time amount of seconds the LED should be lit for.
-     * */
-    public void lightLED(int color, int time);
-
-    /**
-     * Prints barcode.
-     * @param barcode to be printed, supplied as String.
-     * */
-    public void printBarcode(String barcode) throws IllegalArgumentException;
+    public void addTerminal(PincodeTerminal terimal);
 }

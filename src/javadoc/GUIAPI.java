@@ -89,4 +89,11 @@ public interface GUIAPI {
      * @throws IOExeption if user not found.
      * */
     public void setPin(BikeOwner owner, String pin);
+
+    /**
+     * Return HWAPI instance from core.
+     * @return HWAPI instance from core.
+     * */
+    public HWAPI HW();
 }
+

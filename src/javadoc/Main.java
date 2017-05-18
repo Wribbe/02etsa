@@ -38,9 +38,9 @@ import java.util.Comparator;
 
 import java.io.IOException;
 
-import hardware_testdrivers.*;
-
 import java.util.LinkedList;
+
+import hardware_testdrivers.*;
 
 public class Main extends Application {
 
@@ -48,6 +48,9 @@ public class Main extends Application {
     TreeItem global_selected_barcode = null;
 
     BarcodePrinterTestDriver printer;
+    BarcodeScannerTestDriver scanner;
+    ElectronicLockTestDriver lock;
+    PincodeTerminalTestDriver terminal;
 
     private static GUIAPI api;
 
@@ -604,9 +607,15 @@ public class Main extends Application {
                 }
                 if (printer == null) {
                     printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
-                    new BarcodeScannerTestDriver("Barcode Scanner", 10, 20);
-                    new ElectronicLockTestDriver("Electronic Lock", 10, 30);
-                    new PincodeTerminalTestDriver("Pincode Terminal", 10, 40);
+                    scanner = new BarcodeScannerTestDriver("Barcode Scanner", 10, 20);
+                    lock = new ElectronicLockTestDriver("Electronic Lock", 10, 30);
+                    terminal = new PincodeTerminalTestDriver("Pincode Terminal", 10, 40);
+                    scanner.registerObserver(api.HW());
+                    terminal.registerObserver(api.HW());
+
+                    // Add hardware to HW instance.
+                    api.HW().addLock(lock);
+                    api.HW().addTerminal(terminal);
                 }
                 printer.printBarcode(((Barcode)global_selected_barcode.getValue()).serial());
             }

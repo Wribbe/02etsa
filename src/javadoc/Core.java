@@ -29,24 +29,25 @@ public class Core implements GUIAPI {
      * Create a new Core instance.
      */
 
-    private Map<String,BikeOwner> db;
-    private Random random;
 
     private final long BARCODE_SEED = 97234098;
     private final int MAX_BARCODES = 100000;
     private final String DATABASE_PATH = "database.txt";
-
     private final Charset CHARSET = Charset.forName("UTF-8");
+    private final int MAX_PARKED = 100;
+
+    private Map<String,BikeOwner> db;
+    private Map<String,List<BikeOwner>> pin_lookup;
+
+    private Random random;
+    private int[] barcode_store = new int[MAX_BARCODES];
+    private Path database_file;
+    private String error = null;
+    private HWAPI HW;
 
     private int issued_barcodes = 0;
-
-    private int[] barcode_store = new int[MAX_BARCODES];
-
-    private Path database_file;
-
-    private String error = null;
-
-    private HWAPI HW;
+    private List<Barcode> parked = new ArrayList<Barcode>();
+    private List<BikeOwner> inside = new ArrayList<BikeOwner>();
 
     public Core() {
 
@@ -55,6 +56,8 @@ public class Core implements GUIAPI {
         database_file = Paths.get(DATABASE_PATH);
 
         db = new HashMap<String, BikeOwner>();
+        pin_lookup = new HashMap<String, List<BikeOwner>>();
+
         if (Files.exists(database_file) && !Files.isDirectory(database_file)) {
             try {
                 Iterator<String> lines = Files.lines(database_file, CHARSET).iterator();
@@ -77,10 +80,62 @@ public class Core implements GUIAPI {
                 // Ignore.
             }
         }
-        HW = new HW();
+        HW = new HW(this);
     }
 
     private String regex_pin = "\\d{4}";
+
+    public HWAPI HW() {
+        return HW;
+    }
+
+    public int space_left() {
+        return MAX_PARKED - parked.size();
+    }
+
+    public void park(Barcode barcode) throws GarageFullException, AlreadyParkedException {
+
+        boolean already_parked = parked.indexOf(barcode) != -1;
+        boolean full = space_left() <= 0;
+
+        if(full) {
+            throw new GarageFullException();
+        }
+
+        if(already_parked) {
+            throw new AlreadyParkedException();
+        }
+
+        parked.add(barcode);
+    }
+
+    public void enter(BikeOwner owner) {
+        boolean notInGarage = inside.indexOf(owner) == -1;
+        if (notInGarage) {
+            inside.add(owner);
+        }
+    }
+
+    public void exit(BikeOwner owner) {
+        int index = inside.indexOf(owner);
+        boolean inGarage = index != -1;
+        if (inGarage) {
+            inside.remove(owner);
+        }
+    }
+
+    public void unpark(Barcode barcode) throws OwnerNotInGarageException {
+        for (BikeOwner owner : inside) {
+            for (Barcode owner_barcode : owner.getBarcodes()) {
+                if (owner_barcode.serial().equals(barcode.serial())) {
+                    inside.remove(owner);
+                    parked.remove(barcode);
+                    return;
+                }
+            }
+        }
+        throw new OwnerNotInGarageException();
+    }
 
     public boolean newBikeOwner(String... values){
         BikeOwner new_owner;
@@ -89,8 +144,23 @@ public class Core implements GUIAPI {
         }
         new_owner = new BikeOwner(values);
         db.put(new_owner.ssn(), new_owner);
+        // Update pin_lookup.
+        List<BikeOwner> same_pin_list = pin_lookup.get(values[0]);
+        if (same_pin_list == null) {
+            same_pin_list = new ArrayList<BikeOwner>();
+            pin_lookup.put(values[0], same_pin_list);
+        }
+        same_pin_list.add(new_owner);
         save();
         return true;
+    }
+
+    public List<BikeOwner> owners_with_pin(String pin) {
+        List<BikeOwner> list = pin_lookup.get(pin);
+        if (list == null) {
+            return new ArrayList<BikeOwner>();
+        }
+        return list;
     }
 
     public boolean editBikeOwner(BikeOwner old_owner, BikeOwner new_owner) {
