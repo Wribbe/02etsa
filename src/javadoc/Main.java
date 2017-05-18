@@ -38,9 +38,7 @@ import java.util.Comparator;
 
 import java.io.IOException;
 
-import hardware_testdrivers.BarcodePrinterTestDriver;
-
-//import hardware_testdrivers.BarcodePrinterTestDriver;
+import hardware_testdrivers.*;
 
 import java.util.LinkedList;
 
@@ -606,8 +604,11 @@ public class Main extends Application {
                 }
                 if (printer == null) {
                     printer = new BarcodePrinterTestDriver("Barcode Printer", 10, 10);
+                    new BarcodeScannerTestDriver("Barcode Scanner", 10, 20);
+                    new ElectronicLockTestDriver("Electronic Lock", 10, 30);
+                    new PincodeTerminalTestDriver("Pincode Terminal", 10, 40);
                 }
-                printer.printBarcode(((Barcode)global_selected_barcode.getValue()).toString());
+                printer.printBarcode(((Barcode)global_selected_barcode.getValue()).serial());
             }
         });
 
