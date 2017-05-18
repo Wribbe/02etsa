@@ -367,6 +367,7 @@ public class Main extends Application {
         });
 
         set_style(login_scene);
+        userTextField.requestFocus();
 
         return login_scene;
     }
