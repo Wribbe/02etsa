@@ -156,6 +156,15 @@ public class Main extends Application {
             return list.toArray(new String[list.size()]);
         }
 
+        public String[] fieldsAsArray(String pin) {
+            List<String> list = new ArrayList<String>();
+            list.add(pin);
+            for (OurTextField field : fields) {
+                list.add(field.getText().trim());
+            }
+            return list.toArray(new String[list.size()]);
+        }
+
         protected String validate() {
             int current_index = 0;
             for (OurTextField field : fields) {
@@ -250,7 +259,7 @@ public class Main extends Application {
             this.owner = owner;
             String[] fields_owner = ((BikeOwner) owner.getValue()).getFields();
             for (int i=0; i<fields.size(); i++) {
-                this.fields.get(i).setText(fields_owner[i]);
+                this.fields.get(i).setText(fields_owner[i+1]);
             }
         }
         public void show() {
@@ -269,7 +278,7 @@ public class Main extends Application {
                     if (validate().equals("")) {
                         output.setText(status_ok());
                         BikeOwner bike_owner = (BikeOwner) owner.getValue();
-                        BikeOwner updated = new BikeOwner(fieldsAsArray());
+                        BikeOwner updated = new BikeOwner(fieldsAsArray(bike_owner.pin()));
                         // Update database before updating GUI object.
                         api.editBikeOwner(bike_owner, updated);
                         // Update GUI object.
