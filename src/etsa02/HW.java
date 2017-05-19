@@ -153,6 +153,9 @@ public class HW implements HWAPI {
         }
 
         public void handleBarcode(String barcode) {
+            if (blocked) {
+                return;
+            }
             ((BarcodeObserver)validator).handleBarcode(barcode);
             if (validator.validate()) {
                 lock.open(20);
@@ -163,6 +166,9 @@ public class HW implements HWAPI {
         }
 
         public void handleCharacter(char c) {
+            if (blocked) {
+                return;
+            }
             if (c == '#') {
                 if (validator.validate()) {
                     SIG_OK.start();
