@@ -80,16 +80,16 @@ public class HW implements HWAPI {
             if (entry) {
                 try {
                     core.park(last_barcode);
-                } catch (GarageFullException e) {
+                } catch (ExceptionGarageFull e) {
                     return false;
-                } catch (AlreadyParkedException e) {
+                } catch (ExceptionAlreadyParked e) {
                     return false;
                 }
                 return core.barcodeRegistered(last_barcode.serial());
             } else {
                 try {
                     core.unpark(last_barcode);
-                } catch (OwnerNotInGarageException e) {
+                } catch (ExceptionOwnerNotInGarage e) {
                     return false;
                 }
             }
@@ -99,7 +99,7 @@ public class HW implements HWAPI {
         public void handleBarcode(String barcode) {
             try {
                 last_barcode = new Barcode(barcode);
-            } catch (NumberFormatException e) {
+            } catch (ExceptionNumberFormat e) {
                 last_barcode = null;
             }
         }

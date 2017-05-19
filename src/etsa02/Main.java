@@ -546,7 +546,12 @@ public class Main extends Application {
                 }
                 // Remove from database.
                 BikeOwner to_be_removed = (BikeOwner) global_selected_owner.getValue();
-                api.removeBikeOwner(to_be_removed);
+                try {
+                    api.removeBikeOwner(to_be_removed);
+                } catch (CoreError e) {
+                    bar_status.setText(e.toString());
+                    return;
+                }
 
                 // Remove from gui.
                 global_selected_owner.getParent().getChildren().remove(global_selected_owner);

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
-import java.util.NoSuchElementException;
+import java.util.ExceptionNoSuchElement;
 import java.io.IOException;
 
 /**
@@ -80,7 +80,7 @@ public class Core implements GUIAPI {
                 // Ignore.
             } catch (NumberFormatException e) {
                 error = "Issued barcodes number in top of database file cannot be parsed.";
-            } catch (NoSuchElementException e) { // Empty database file.
+            } catch (ExceptionNoSuchElement e) { // Empty database file.
                 // ignore.
             }
         } else {
@@ -103,17 +103,17 @@ public class Core implements GUIAPI {
         return MAX_PARKED - parked.size();
     }
 
-    public void park(Barcode barcode) throws GarageFullException, AlreadyParkedException {
+    public void park(Barcode barcode) throws ExceptionGarageFull, ExceptionAlreadyParked {
 
         boolean already_parked = parked.indexOf(barcode) != -1;
         boolean full = space_left() <= 0;
 
         if(full) {
-            throw new GarageFullException();
+            throw new ExceptionGarageFull();
         }
 
         if(already_parked) {
-            throw new AlreadyParkedException();
+            throw new ExceptionAlreadyParked();
         }
 
         parked.add(barcode);
@@ -134,7 +134,7 @@ public class Core implements GUIAPI {
         }
     }
 
-    public void unpark(Barcode barcode) throws OwnerNotInGarageException {
+    public void unpark(Barcode barcode) throws ExceptionOwnerNotInGarage {
         for (BikeOwner owner : inside) {
             for (Barcode owner_barcode : owner.getBarcodes()) {
                 if (owner_barcode.serial().equals(barcode.serial())) {
@@ -144,7 +144,7 @@ public class Core implements GUIAPI {
                 }
             }
         }
-        throw new OwnerNotInGarageException();
+        throw new ExceptionOwnerNotInGarage();
     }
 
     public boolean newBikeOwner(String... values){
