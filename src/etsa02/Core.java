@@ -334,7 +334,6 @@ public class Core implements GUIAPI {
     }
 
     private String getPin() {
-      System.out.println(pin_store[issued_pins]);
       return String.format("%04d",pin_store[issued_pins++]);
     }
 }
