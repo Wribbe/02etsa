@@ -71,6 +71,7 @@ public class Core implements GUIAPI {
             try {
                 Iterator<String> lines = Files.lines(database_file, CHARSET).iterator();
                 issued_barcodes = new Integer(lines.next());
+                issued_pins = new Integer(lines.next());
                 restore_parked(lines.next());
                 while(lines.hasNext()) {
                     String line = lines.next();
@@ -321,6 +322,7 @@ public class Core implements GUIAPI {
             Files.createFile(database_file);
             List<String> list = new ArrayList<String>();
             list.add(Integer.toString(issued_barcodes));
+            list.add(Integer.toString(issued_pins));
             StringBuilder strb = new StringBuilder();
             for (Barcode barcode : parked) {
                 strb.append(barcode.serial());
