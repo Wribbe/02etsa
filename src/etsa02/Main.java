@@ -1,6 +1,7 @@
 package etsa02;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -31,6 +32,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -707,11 +709,18 @@ public class Main extends Application {
 
     public void start(Stage primaryStage)
     {
+
         stage_main = primaryStage;
         stage_main.setWidth(LOGIN_WIDTH);
         stage_main.setHeight(LOGIN_HEIGHT);
         stage_main.setMinWidth(LOGIN_WIDTH);
         stage_main.setMinHeight(LOGIN_HEIGHT);
+
+        stage_main.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent arg0) {
+                Platform.exit();
+            }
+        });
 
         stage_main.setTitle("EasyPark -- Ultimate garage maintainer.");
 
