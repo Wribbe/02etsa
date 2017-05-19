@@ -553,11 +553,17 @@ public class Main extends Application {
                     return;
                 }
 
+                // Any bikes stored?
+                String exit_message = to_be_removed.name()+" successfully removed.";
+
                 // Remove from gui.
+                if(!global_selected_owner.getChildren().isEmpty()) {
+                    exit_message = "A bike is registered to this account, it will still be removed.";
+                }
                 global_selected_owner.getParent().getChildren().remove(global_selected_owner);
                 global_selected_owner = null;
 
-                bar_status.setText(to_be_removed.name()+" successfully removed.");
+                bar_status.setText(exit_message);
             }
         });
 

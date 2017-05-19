@@ -195,7 +195,7 @@ public class Core implements GUIAPI {
         }
         for (Barcode barcode : stored.getBarcodes()) {
             if (parked.indexOf(barcode) != -1) {
-                throw new ExceptionBikeStillInGarage("Please remove "+barcode+" from garage.");
+                throw new ExceptionBikeStillInGarage("Account could not be removed, user has bike in the garage.");
             }
         }
         for (Barcode barcode : stored.getBarcodes()) {
