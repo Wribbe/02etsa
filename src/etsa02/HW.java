@@ -80,15 +80,16 @@ public class HW implements HWAPI {
             if (entry) {
                 try {
                     core.park(last_barcode);
-                } catch (GarageFullException e) {
+                } catch (ExceptionGarageFull e) {
                     return false;
-                } catch (AlreadyParkedException e) {
+                } catch (ExceptionAlreadyParked e) {
                     return false;
                 }
+                return core.barcodeRegistered(last_barcode.serial());
             } else {
                 try {
                     core.unpark(last_barcode);
-                } catch (OwnerNotInGarageException e) {
+                } catch (ExceptionOwnerNotInGarage e) {
                     return false;
                 }
             }
@@ -131,6 +132,7 @@ public class HW implements HWAPI {
 
             SIG_OK.prioritized = true;
             SIG_ERR_BLOCKED.blocker = true;
+            SIG_ERR_BLOCKED.prioritized = true;
         }
 
         public Warden(PincodeTerminal terminal, ElectronicLock lock) {
@@ -151,6 +153,9 @@ public class HW implements HWAPI {
         }
 
         public void handleBarcode(String barcode) {
+            if (blocked) {
+                return;
+            }
             ((BarcodeObserver)validator).handleBarcode(barcode);
             if (validator.validate()) {
                 lock.open(20);
@@ -161,17 +166,20 @@ public class HW implements HWAPI {
         }
 
         public void handleCharacter(char c) {
+            if (blocked) {
+                return;
+            }
             if (c == '#') {
                 if (validator.validate()) {
                     SIG_OK.start();
                     lock.open(20);
                     invalid_inputs = 0;
                 } else {
+                    invalid_inputs++;
                     if (invalid_inputs >= 10) {
                         SIG_ERR_BLOCKED.start();
                     } else {
                         SIG_ERR_NORMAL.start();
-                        invalid_inputs++;
                     }
                 }
             } else {
@@ -222,6 +230,9 @@ public class HW implements HWAPI {
                     warden.thread = new Thread(this);
                     warden.thread.start();
                 }
+            }
+            if (blocker) {
+                warden.blocked = true;
             }
         }
 

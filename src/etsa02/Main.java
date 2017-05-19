@@ -1,6 +1,7 @@
 package etsa02;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -31,6 +32,7 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -544,11 +546,24 @@ public class Main extends Application {
                 }
                 // Remove from database.
                 BikeOwner to_be_removed = (BikeOwner) global_selected_owner.getValue();
-                api.removeBikeOwner(to_be_removed);
+                try {
+                    api.removeBikeOwner(to_be_removed);
+                } catch (ExceptionCoreError err) {
+                    bar_status.setText(err.toString());
+                    return;
+                }
+
+                // Any bikes stored?
+                String exit_message = to_be_removed.name()+" successfully removed.";
 
                 // Remove from gui.
+                if(!global_selected_owner.getChildren().isEmpty()) {
+                    exit_message = "A bike is registered to this account, it will still be removed.";
+                }
                 global_selected_owner.getParent().getChildren().remove(global_selected_owner);
                 global_selected_owner = null;
+
+                bar_status.setText(exit_message);
             }
         });
 
@@ -598,7 +613,12 @@ public class Main extends Application {
                 // Remove from core.
                 Barcode to_be_removed = (Barcode) global_selected_barcode.getValue();
                 BikeOwner owner = (BikeOwner) global_selected_barcode.getParent().getValue();
-                api.removeBarcode(owner, to_be_removed);
+                try {
+                    api.removeBarcode(owner, to_be_removed);
+                } catch (ExceptionCoreError err) {
+                    bar_status.setText(err.toString());
+                    return;
+                }
 
                 // Remove from gui.
                 List<TreeItem<ListElement>> children = global_selected_barcode.getParent().getChildren();
@@ -707,11 +727,18 @@ public class Main extends Application {
 
     public void start(Stage primaryStage)
     {
+
         stage_main = primaryStage;
         stage_main.setWidth(LOGIN_WIDTH);
         stage_main.setHeight(LOGIN_HEIGHT);
         stage_main.setMinWidth(LOGIN_WIDTH);
         stage_main.setMinHeight(LOGIN_HEIGHT);
+
+        stage_main.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            public void handle(WindowEvent arg0) {
+                Platform.exit();
+            }
+        });
 
         stage_main.setTitle("EasyPark -- Ultimate garage maintainer.");
 
