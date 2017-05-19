@@ -12,6 +12,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class representing the current software -> hardware bridge.
+ *
+ * @author AUTHOR-TAG
+ * @version 1.0
+ * @since 0.8
+ */
 public class HW implements HWAPI {
 
     private Core core;

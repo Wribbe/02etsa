@@ -46,6 +46,13 @@ import java.util.LinkedList;
 import hardware_testdrivers.*;
 import hardware_interfaces.*;
 
+/**
+ * Main JavaFx interface runnable application.
+ *
+ * @author AUTHOR-TAG
+ * @version 1.0
+ * @since 0.1
+ */
 public class Main extends Application {
 
     TreeItem global_selected_owner = null;

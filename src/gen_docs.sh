@@ -1,3 +1,3 @@
 #!/bin/sh
 directory=${1}
-javadoc -d doc ${directory}
+javadoc -cp .:../* -d doc ${directory}

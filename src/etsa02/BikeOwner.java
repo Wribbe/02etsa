@@ -23,7 +23,6 @@ public class BikeOwner implements ListElement, Comparable {
 
     /**
      * Create a new BikeOwner instance.
-     *
      * @param args 6 consecutive strings; pin, name, ssn, address, phone and email.
      */
     public BikeOwner(String... args) {
@@ -48,32 +47,32 @@ public class BikeOwner implements ListElement, Comparable {
     }
 
     /**
-     * @return users pin.
+     * @return Sring representing users pin
      */
     protected String pin() {return this.fields[0];}
     /**
-     * @return users name.
+     * @return Sring representing users name
      */
     public String name() {return this.fields[1];}
     /**
-     * @return users ssn.
+     * @return Sring representing users SSN
      */
     public String ssn() {return this.fields[2];}
     /**
-     * @return users address.
+     * @return Sring representing users address
      */
     public String address() {return this.fields[3];}
     /**
-     * @return users phone.
+     * @return Sring representing users phone number
      */
     public String phone() {return this.fields[4];}
     /**
-     * @return users email.
+     * @return Sring representing users email
      */
     public String email() {return this.fields[5];}
 
     /**
-     * @return users as String.
+     * @return String representation of user
      */
     public String toString() {
         return ssn()+" : "+name()+" : "+pin();
@@ -96,8 +95,7 @@ public class BikeOwner implements ListElement, Comparable {
 
     /**
      * @param o Object to be compeered to.
-     * @return integer < 0 if this is < then o, == 0 if this == 0 and > 0 if
-     * this > 0.
+     * @return int value for comparison.
      */
     public int compareTo(Object o) {
         BikeOwner other = (BikeOwner) o;

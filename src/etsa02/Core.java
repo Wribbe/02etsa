@@ -28,11 +28,6 @@ import java.io.IOException;
  */
 public class Core implements GUIAPI {
 
-    /**
-     * Create a new Core instance.
-     */
-
-
     private final long BARCODE_SEED = 97234098;
     private final int MAX_BARCODES = 100000;
     private final int MAX_PIN = 10000;
@@ -56,6 +51,9 @@ public class Core implements GUIAPI {
     private List<Barcode> parked = new ArrayList<Barcode>();
     private List<BikeOwner> inside = new ArrayList<BikeOwner>();
 
+    /**
+     * Create a new Core instance, read and parse any database files.
+     */
     public Core() {
 
         database_file = Paths.get(DATABASE_PATH);
@@ -320,6 +318,7 @@ public class Core implements GUIAPI {
     private void save() {
         try {
             Files.deleteIfExists(database_file);
+
             Files.createFile(database_file);
             List<String> list = new ArrayList<String>();
             list.add(Integer.toString(issued_barcodes));

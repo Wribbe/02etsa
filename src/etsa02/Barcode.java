@@ -20,6 +20,7 @@ public class Barcode implements ListElement {
 
     /**
      * Create a new Barcode instance using int.
+     * @param serial int input for Barcode creation.
      */
     public Barcode(int serial) {
         this.serial = String.format("%05d", serial);
@@ -27,15 +28,23 @@ public class Barcode implements ListElement {
 
     /**
      * Create a new Barcode instance using string.
+     * @param serial String input for Barcode creation.
      */
     public Barcode(String serial) {
         this.serial = String.format("%05d", new Integer(serial));
     }
 
+    /**
+     * Return string representation for Barcode.
+     */
     public String toString() {
         return serial;
     }
 
+    /**
+     * Return Barcode serial.
+     * @return String representation of serial.
+     */
     public String serial() {
         return serial;
     }
