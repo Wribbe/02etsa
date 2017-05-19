@@ -181,11 +181,16 @@ public class Core implements GUIAPI {
         return true;
     }
 
-    public boolean removeBikeOwner(BikeOwner owner){
+    public boolean removeBikeOwner(BikeOwner owner) throws ExceptionBikeStillInGarage {
         BikeOwner stored = db.get(owner.ssn());
         if (stored == null) {
             System.err.println("No owner found.");
             return false;
+        }
+        for (Barcode barcode : stored.getBarcodes()) {
+            if (parked.indexOf(barcode) != -1) {
+                throw new ExceptionBikeStillInGarage("Please remove "+barcode+" from garage.");
+            }
         }
         for (Barcode barcode : stored.getBarcodes()) {
             registered_bikes.remove(barcode.serial());
@@ -216,8 +221,10 @@ public class Core implements GUIAPI {
             System.err.println("No owner found.");
             return false;
         }
+        registered_bikes.remove(barcode.serial());
+        boolean deleted = stored.remove_barcode(barcode);
         save();
-        return stored.remove_barcode(barcode);
+        return deleted;
     }
 
     public boolean barcodeRegistered(String serial) {

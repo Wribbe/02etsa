@@ -38,7 +38,7 @@ public interface GUIAPI {
      * @param owner BikeOwner to be edited.
      * @return boolean signaling successful removal.
      * */
-    public boolean removeBikeOwner(BikeOwner owner);
+    public boolean removeBikeOwner(BikeOwner owner) throws ExceptionCoreError;
 
     /**
      * Add barcode to existing BikeOwner.

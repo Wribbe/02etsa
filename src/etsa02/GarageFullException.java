@@ -1,4 +1,4 @@
 package etsa02;
 
-public class GarageFullException extends Exception {
+public class GarageFullException extends ExceptionCoreError {
 }
