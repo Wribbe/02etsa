@@ -145,6 +145,7 @@ public class Core implements GUIAPI {
                 if (owner_barcode.serial().equals(barcode.serial())) {
                     inside.remove(owner);
                     parked.remove(barcode);
+                    save();
                     return;
                 }
             }
