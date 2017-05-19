@@ -131,6 +131,7 @@ public class HW implements HWAPI {
 
             SIG_OK.prioritized = true;
             SIG_ERR_BLOCKED.blocker = true;
+            SIG_ERR_BLOCKED.prioritized = true;
         }
 
         public Warden(PincodeTerminal terminal, ElectronicLock lock) {
@@ -167,11 +168,11 @@ public class HW implements HWAPI {
                     lock.open(20);
                     invalid_inputs = 0;
                 } else {
+                    invalid_inputs++;
                     if (invalid_inputs >= 10) {
                         SIG_ERR_BLOCKED.start();
                     } else {
                         SIG_ERR_NORMAL.start();
-                        invalid_inputs++;
                     }
                 }
             } else {
