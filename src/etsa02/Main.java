@@ -27,6 +27,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -69,8 +70,8 @@ public class Main extends Application {
     int LOGIN_HEIGHT = 400;
     int LOGIN_WIDTH = 800;
 
-    int MAIN_HEIGHT = 200;
-    int MAIN_WIDTH = 200;
+    int MAIN_HEIGHT = LOGIN_HEIGHT;
+    int MAIN_WIDTH = LOGIN_WIDTH;
 
     TreeItem<ListElement> users;
     TreeView<ListElement> view_root;
@@ -127,7 +128,6 @@ public class Main extends Application {
             dialog.setHeight(POPUP_HEIGHT);
             dialog.setMinWidth(POPUP_WIDTH);
             dialog.setMinHeight(POPUP_HEIGHT);
-            dialog.setResizable(false);
 
             grid = get_grid();
 
@@ -153,7 +153,7 @@ public class Main extends Application {
             dialog.setScene(scene);
             // Focus on first field.
             fields.get(0).requestFocus();
-            scene.getStylesheets().add(Main.class.getResource("../etsa02/login.css").toExternalForm());
+            scene.getStylesheets().add(Main.class.getResource("login.css").toExternalForm());
 
         }
 
@@ -327,7 +327,7 @@ public class Main extends Application {
 
     public void set_style(Scene scene)
     {
-        String resource = Main.class.getResource("../etsa02/login.css").toExternalForm();
+        String resource = Main.class.getResource("login.css").toExternalForm();
         scene.getStylesheets().add(resource);
     }
 
@@ -552,7 +552,7 @@ public class Main extends Application {
             }
         });
 
-        OurButton button_add_barcode = new OurButton("Add barcode");
+        OurButton button_add_barcode = new OurButton("Add bike");
         button_grid.add(button_add_barcode, 1, 3);
         button_add_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
@@ -587,7 +587,7 @@ public class Main extends Application {
             }
         });
 
-        OurButton button_remove_barcode = new OurButton("Remove barcode");
+        OurButton button_remove_barcode = new OurButton("Remove bike");
         button_grid.add(button_remove_barcode, 1, 4);
         button_remove_barcode.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent e) {
@@ -634,6 +634,14 @@ public class Main extends Application {
 
         // Add list grid to main grid.
         main_grid.add(list_grid, 0, 0);
+
+
+        ColumnConstraints column1 = new ColumnConstraints(MAIN_WIDTH/4,MAIN_HEIGHT,Double.MAX_VALUE);
+        column1.setHgrow(Priority.ALWAYS);
+
+        main_grid.getColumnConstraints().add(column1);
+        list_grid.getColumnConstraints().add(column1);
+
 
 
         // Add search bar.
@@ -704,7 +712,6 @@ public class Main extends Application {
         stage_main.setHeight(LOGIN_HEIGHT);
         stage_main.setMinWidth(LOGIN_WIDTH);
         stage_main.setMinHeight(LOGIN_HEIGHT);
-        stage_main.setResizable(false);
 
         stage_main.setTitle("EasyPark -- Ultimate garage maintainer.");
 
