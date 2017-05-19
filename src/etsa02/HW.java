@@ -224,15 +224,15 @@ public class HW implements HWAPI {
             if (warden.thread == null || !warden.thread.isAlive()) {
                 warden.thread = new Thread(this);
                 warden.thread.start();
-                if (blocker) {
-                    warden.blocked = true;
-                }
             } else {
                 if (prioritized && !warden.blocked) {
                     warden.thread.interrupt();
                     warden.thread = new Thread(this);
                     warden.thread.start();
                 }
+            }
+            if (blocker) {
+                warden.blocked = true;
             }
         }
 
