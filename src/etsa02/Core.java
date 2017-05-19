@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.charset.Charset;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
-import java.util.ExceptionNoSuchElement;
+import java.util.NoSuchElementException;
 import java.io.IOException;
 
 /**
@@ -70,18 +71,17 @@ public class Core implements GUIAPI {
             try {
                 Iterator<String> lines = Files.lines(database_file, CHARSET).iterator();
                 issued_barcodes = new Integer(lines.next());
-                int current_line = 1;
+                restore_parked(lines.next());
                 while(lines.hasNext()) {
                     String line = lines.next();
                     newBikeOwner(line.split(GUIAPI.delimiter));
-                    current_line++;
                 }
             } catch (IOException e) {
-                // Ignore.
+                System.err.println("IOException.");
             } catch (NumberFormatException e) {
-                error = "Issued barcodes number in top of database file cannot be parsed.";
-            } catch (ExceptionNoSuchElement e) { // Empty database file.
-                // ignore.
+                System.err.println("Issued barcodes number in top of database file cannot be parsed.");
+            } catch (NoSuchElementException e) { // Empty database file.
+                System.err.println("NoSuchElementExcepiton.");
             }
         } else {
             try {
@@ -91,6 +91,18 @@ public class Core implements GUIAPI {
             }
         }
         HW = new HW(this);
+    }
+
+    private void restore_parked(String string) {
+        if (string.trim().equals("")) {
+            return;
+        }
+        String[] tokens = string.split(Barcode.delimiter);
+        if (tokens.length > 0) {
+            for (String barcode : Arrays.asList(tokens)) {
+                parked.add(new Barcode(barcode));
+            }
+        }
     }
 
     private String regex_pin = "\\d{4}";
@@ -117,20 +129,13 @@ public class Core implements GUIAPI {
         }
 
         parked.add(barcode);
+        save();
     }
 
     public void enter(BikeOwner owner) {
         boolean notInGarage = inside.indexOf(owner) == -1;
         if (notInGarage) {
             inside.add(owner);
-        }
-    }
-
-    public void exit(BikeOwner owner) {
-        int index = inside.indexOf(owner);
-        boolean inGarage = index != -1;
-        if (inGarage) {
-            inside.remove(owner);
         }
     }
 
@@ -235,7 +240,7 @@ public class Core implements GUIAPI {
     }
 
     public int barcodesLeft() {
-        return MAX_BARCODES - issued_barcodes - 1;
+        return MAX_BARCODES - issued_barcodes;
     }
 
     public Barcode newBarcode() {
@@ -312,6 +317,12 @@ public class Core implements GUIAPI {
             Files.createFile(database_file);
             List<String> list = new ArrayList<String>();
             list.add(Integer.toString(issued_barcodes));
+            StringBuilder strb = new StringBuilder();
+            for (Barcode barcode : parked) {
+                strb.append(barcode.serial());
+                strb.append(Barcode.delimiter);
+            }
+            list.add(strb.toString());
             list.addAll(list_users_encoded());
             Files.write(database_file, list, CHARSET);
         } catch (IOException e) {

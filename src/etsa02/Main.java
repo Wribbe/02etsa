@@ -548,14 +548,16 @@ public class Main extends Application {
                 BikeOwner to_be_removed = (BikeOwner) global_selected_owner.getValue();
                 try {
                     api.removeBikeOwner(to_be_removed);
-                } catch (CoreError e) {
-                    bar_status.setText(e.toString());
+                } catch (ExceptionCoreError err) {
+                    bar_status.setText(err.toString());
                     return;
                 }
 
                 // Remove from gui.
                 global_selected_owner.getParent().getChildren().remove(global_selected_owner);
                 global_selected_owner = null;
+
+                bar_status.setText(to_be_removed.name()+" successfully removed.");
             }
         });
 

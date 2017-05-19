@@ -99,7 +99,7 @@ public class HW implements HWAPI {
         public void handleBarcode(String barcode) {
             try {
                 last_barcode = new Barcode(barcode);
-            } catch (ExceptionNumberFormat e) {
+            } catch (NumberFormatException e) {
                 last_barcode = null;
             }
         }
