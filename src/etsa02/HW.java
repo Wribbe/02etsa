@@ -85,6 +85,7 @@ public class HW implements HWAPI {
                 } catch (AlreadyParkedException e) {
                     return false;
                 }
+                return core.barcodeRegistered(last_barcode.serial());
             } else {
                 try {
                     core.unpark(last_barcode);

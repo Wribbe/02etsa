@@ -41,6 +41,7 @@ public class Core implements GUIAPI {
 
     private Map<String,BikeOwner> db;
     private Map<String,BikeOwner> pin_lookup;
+    private Map<String, Boolean> registered_bikes;
 
     private Random random;
     private int[] barcode_store;
@@ -63,6 +64,7 @@ public class Core implements GUIAPI {
 
         barcode_store = fill_with_shuffled_numbers(MAX_BARCODES);
         pin_store = fill_with_shuffled_numbers(MAX_PIN);
+        registered_bikes = new HashMap<String, Boolean>();
 
         if (Files.exists(database_file) && !Files.isDirectory(database_file)) {
             try {
@@ -151,6 +153,9 @@ public class Core implements GUIAPI {
             values[0] = getPin();
         }
         new_owner = new BikeOwner(values);
+        for (Barcode barcode : new_owner.getBarcodes()) {
+            registered_bikes.put(barcode.serial(), true);
+        }
         db.put(new_owner.ssn(), new_owner);
         // Update pin_lookup.
         pin_lookup.put(values[0], new_owner);
@@ -182,6 +187,9 @@ public class Core implements GUIAPI {
             System.err.println("No owner found.");
             return false;
         }
+        for (Barcode barcode : stored.getBarcodes()) {
+            registered_bikes.remove(barcode.serial());
+        }
         db.remove(owner.ssn());
         save();
         return true;
@@ -194,6 +202,7 @@ public class Core implements GUIAPI {
             return false;
         }
         stored.add_barcode(barcode);
+        registered_bikes.put(barcode.serial(), true);
         if (issued_barcodes < MAX_BARCODES) {
             issued_barcodes++;
         }
@@ -209,6 +218,13 @@ public class Core implements GUIAPI {
         }
         save();
         return stored.remove_barcode(barcode);
+    }
+
+    public boolean barcodeRegistered(String serial) {
+        if (registered_bikes.get(serial) == null) {
+            return false;
+        }
+        return true;
     }
 
     public int barcodesLeft() {
