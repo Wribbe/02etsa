@@ -607,7 +607,12 @@ public class Main extends Application {
                 // Remove from core.
                 Barcode to_be_removed = (Barcode) global_selected_barcode.getValue();
                 BikeOwner owner = (BikeOwner) global_selected_barcode.getParent().getValue();
-                api.removeBarcode(owner, to_be_removed);
+                try {
+                    api.removeBarcode(owner, to_be_removed);
+                } catch (ExceptionCoreError err) {
+                    bar_status.setText(err.toString());
+                    return;
+                }
 
                 // Remove from gui.
                 List<TreeItem<ListElement>> children = global_selected_barcode.getParent().getChildren();

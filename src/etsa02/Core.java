@@ -220,11 +220,14 @@ public class Core implements GUIAPI {
         return true;
     }
 
-    public boolean removeBarcode(BikeOwner owner, Barcode barcode) {
+    public boolean removeBarcode(BikeOwner owner, Barcode barcode) throws ExceptionBikeStillInGarage {
         BikeOwner stored = db.get(owner.ssn());
         if (stored == null) {
             System.err.println("No owner found.");
             return false;
+        }
+        if (parked.contains(barcode)) {
+            throw new ExceptionBikeStillInGarage("Please remove bike: "+barcode.serial()+" from the garage.");
         }
         registered_bikes.remove(barcode.serial());
         boolean deleted = stored.remove_barcode(barcode);

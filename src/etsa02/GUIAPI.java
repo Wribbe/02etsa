@@ -54,7 +54,7 @@ public interface GUIAPI {
      * @param code Barcode that should be removed.
      * @return boolean signaling successful removal.
      * */
-    public boolean removeBarcode(BikeOwner owner, Barcode code);
+    public boolean removeBarcode(BikeOwner owner, Barcode code) throws ExceptionCoreError ;
 
     /**
      * List all users currently in the database.
