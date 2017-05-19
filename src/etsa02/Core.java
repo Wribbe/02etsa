@@ -229,7 +229,8 @@ public class Core implements GUIAPI {
             return false;
         }
         if (parked.contains(barcode)) {
-            throw new ExceptionBikeStillInGarage("Please remove bike: "+barcode.serial()+" from the garage.");
+            String error = "Could not unregister bike, a bike belonging to this account is parked in the garage";
+            throw new ExceptionBikeStillInGarage(error);
         }
         registered_bikes.remove(barcode.serial());
         boolean deleted = stored.remove_barcode(barcode);
