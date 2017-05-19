@@ -36,6 +36,7 @@ public interface GUIAPI {
     /**
      * Remove existing BikeOwner.
      * @param owner BikeOwner to be edited.
+     * @throws ExceptionCoreError with message why user can't be removed.
      * @return boolean signaling successful removal.
      * */
     public boolean removeBikeOwner(BikeOwner owner) throws ExceptionCoreError;
@@ -52,6 +53,7 @@ public interface GUIAPI {
      * Remove barcode from existing BikeOwner.
      * @param owner BikeOwner to get barcode removed.
      * @param code Barcode that should be removed.
+     * @throws ExceptionCoreError with message why barcode can't be removed.
      * @return boolean signaling successful removal.
      * */
     public boolean removeBarcode(BikeOwner owner, Barcode code) throws ExceptionCoreError ;
@@ -77,7 +79,7 @@ public interface GUIAPI {
     /**
      * Get pin for user with SSN.
      * @param ssn SSN for user of pin.
-     * @throws IOExeption if user not found.
+     * @throws IOException if user not found.
      * @return String representing pin for user.
      * */
     public String pin(String ssn) throws IOException;
@@ -86,7 +88,6 @@ public interface GUIAPI {
      * Set pin for user with SSN.
      * @param owner owner that should have new pin.
      * @param pin new pin.
-     * @throws IOExeption if user not found.
      * */
     public void setPin(BikeOwner owner, String pin);
 
@@ -95,5 +96,49 @@ public interface GUIAPI {
      * @return HWAPI instance from core.
      * */
     public HWAPI HW();
-}
 
+    /**
+     * Check if a given serial number corresponds to a registered barcode.
+     * @return boolean representing if serial is registered or not.
+     */
+    public boolean barcodeRegistered(String serial);
+
+    /**
+     * Try to remove the bike from the garage.
+     * @param barcode Barcode instance representing the bike that should leave
+     * the garage.
+     * @throws ExceptionOwnerNotInGarage if owner is not registered as beeing
+     * inside the garage.
+     */
+    public void unpark(Barcode barcode) throws ExceptionOwnerNotInGarage;
+
+    /**
+     * Registers that a user has entered the grarage.
+     * @param owner Instance of BikeOwner representing the user.
+     * exited.
+     */
+    public void enter(BikeOwner owner);
+
+    /**
+     * Return the number of unoccupied parking spaces.
+     * @param barcode Barcode instance of bike that should be parked in garage.
+     * @throws ExceptionGarageFull on full garage.
+     * @throws ExceptionAlreadyParked if barcode already registered but not
+     * exited.
+     */
+    public void park(Barcode barcode) throws ExceptionGarageFull, ExceptionAlreadyParked;
+
+    /**
+     * Return the number of unoccupied parking spaces.
+     * @return int value representing space left in garage.
+     */
+    public int space_left();
+
+    /**
+     * Return instance of BikeOwner that has pin
+     * @param pin the pin that the user should have.
+     * @return BikeOwner that has the given pin.
+     * @throws IOException if user with pin was not found.
+     */
+    public BikeOwner userWithPin(String pin) throws IOException;
+}
